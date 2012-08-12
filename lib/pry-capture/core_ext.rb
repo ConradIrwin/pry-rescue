@@ -19,9 +19,8 @@ class Pry
       end
     end
 
-  ensure
-    if raised.any?
-      PryCapture.enter_exception_context(raised)
-    end
+  rescue Exception => e
+    PryCapture.enter_exception_context(raised)
+    raise
   end
 end

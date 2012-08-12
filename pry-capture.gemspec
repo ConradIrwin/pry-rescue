@@ -1,7 +1,4 @@
-# For packaging Octokey, please use "rake gems; rake pushgems".
-# This gemspec will only generate the correct gem for the current platform.
 Gem::Specification.new do |s|
-
   s.name          = 'pry-capture'
   s.version       = '0.1'
   s.summary       = 'Open a pry session on any unhandled exceptions'
@@ -12,5 +9,5 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n")
   s.require_paths = ["lib"]
 
-  s.add_dependency 'pry-stack_explorer'
+  s.add_dependency 'interception'
 end

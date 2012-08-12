@@ -73,9 +73,9 @@ pry-stack explorer
 ==================
 
 If you're running rubinius, or ruby-1.9, then you can use `pry-capture` alongside
-`pry-stack_explorer`. This gives you the ability to move `up` or `down the stack so that
-you can get a better idea of why your function ended up in a bad state. See 
-example2.rb](https://github.com/ConradIrwin/pry-capture/blob/master/examples/example2.rb) to get a feel for what this is like.
+`pry-stack_explorer`. This gives you the ability to move `up` or `down` the stack so that
+you can get a better idea of why your function ended up in a bad state. Run
+[example2.rb](https://github.com/ConradIrwin/pry-capture/blob/master/examples/example2.rb) to get a feel for what this is like.
 
 Known bugs
 ==========
