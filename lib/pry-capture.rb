@@ -2,6 +2,7 @@ require 'rubygems'
 require 'interception'
 require 'pry'
 
+require File.expand_path('../pry-capture/core_ext', __FILE__)
 require File.expand_path('../pry-capture/commands', __FILE__)
 
 begin
@@ -9,34 +10,17 @@ begin
 rescue LoadError
 end
 
-class Pry
-
+class PryCapture
   class << self
-    # Intercept all exceptions that arise in the block and start a Pry session
-    # at the fail site.
-    def capture(&block)
-      raised = []
-
-      Interception.listen(block) do |exception, binding|
-        if defined?(PryStackExplorer)
-          raised << [exception, binding.callers]
-        else
-          raised << [exception, Array(binding)]
-        end
-      end
-
-    ensure
-      if raised.any?
-        exception, bindings = raised.last
-       enter_exception_context(exception, bindings, raised)
-      end
-    end
 
     # Start a Pry session in the context of the exception.
     # @param [Exception] exception The exception.
     # @param [Array<Binding>] bindings The call stack.
-    def enter_exception_context(exception, bindings, raised)
+    def enter_exception_context(raised)
+      exception, bindings = raised.last
+
       prune_call_stack!(bindings)
+
       if defined?(PryStackExplorer)
         pry :call_stack => bindings, :hooks => pry_hooks(exception, raised)
       else
@@ -55,6 +39,7 @@ class Pry
         _pry_.last_exception = ex
         _pry_.backtrace = ex.backtrace
         _pry_.sticky_locals.merge!({ :_raised_ => raised })
+        _pry_.exception_handler.call(_pry_.output, ex, _pry_)
       end
 
       hooks

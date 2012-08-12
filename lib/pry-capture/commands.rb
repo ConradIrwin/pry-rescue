@@ -36,8 +36,7 @@ Pry::Commands.create_command "cd-cause", "Move to the previously raised exceptio
     raised.pop
 
     if raised.any?
-      exception, bindings = raised.last
-      Pry.enter_exception_context(exception, bindings, raised)
+      PryCapture.enter_exception_context(raised)
     else
       raise Pry::CommandError, "No previous exception detected"
     end
