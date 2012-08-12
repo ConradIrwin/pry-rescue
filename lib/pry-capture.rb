@@ -37,10 +37,11 @@ class Pry
     # @param [Exception] exception The exception.
     # @param [Array<Binding>] bindings The call stack.
     def enter_exception_context(exception, bindings, raised)
+      prune_call_stack!(bindings)
+
       inject_local("_ex_", exception, bindings.first)
       inject_local("_raised_", raised, bindings.first)
 
-      prune_call_stack!(bindings)
       if defined?(PryStackExplorer)
         pry :call_stack => bindings
       else
@@ -53,7 +54,7 @@ class Pry
     # Sanitize the call stack.
     # @param [Array<Binding>] bindings The call stack.
     def prune_call_stack!(bindings)
-      bindings.delete_if { |b| b.eval("self") == self || b.eval("__method__") == :prycept }
+      bindings.delete_if { |b| [Pry, Interception].include?(b.eval("self")) }
     end
 
     # Inject a local variable into a binding.
