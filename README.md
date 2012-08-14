@@ -1,14 +1,14 @@
-pry-capture allows you to start a Pry session on any unhandled exceptions in your code.
+pry-rescue allows you to start a Pry session on any unhandled exceptions in your code.
 
 
 Installation
 ============
-Either `gem install pry-capture`, or add it to the development section of your Gemfile:
+Either `gem install pry-rescue`, or add it to the development section of your Gemfile:
 
 ```ruby
 source :rubygems
 group :development do
-  gem 'pry-capture'
+  gem 'pry-rescue'
   gem 'pry-stack_explorer' # if you're using MRI 1.9 and you want it to be awesome.
 end
 ```
@@ -16,11 +16,11 @@ end
 Usage
 =====
 
-In development, wrap your code in `Pry::capture{ }`; then any exceptions that are raised
+In development, wrap your code in `Pry::rescue{ }`; then any exceptions that are raised
 but not rescued will open a pry session.
 
 ```ruby
-require 'pry-capture'
+require 'pry-rescue'
 
 def test
   raise "foo"
@@ -28,7 +28,7 @@ rescue => e
   raise "bar"
 end
 
-Pry.capture do
+Pry.rescue do
   test
 end
 ```
@@ -72,10 +72,10 @@ To get back from `cd-cause` you can either type `<ctrl+d>` or `cd ..`.
 pry-stack explorer
 ==================
 
-If you're running rubinius, or ruby-1.9, then you can use `pry-capture` alongside
+If you're running rubinius, or ruby-1.9, then you can use `pry-rescue` alongside
 `pry-stack_explorer`. This gives you the ability to move `up` or `down` the stack so that
 you can get a better idea of why your function ended up in a bad state. Run
-[example2.rb](https://github.com/ConradIrwin/pry-capture/blob/master/examples/example2.rb) to get a feel for what this is like.
+[example2.rb](https://github.com/ConradIrwin/pry-rescue/blob/master/examples/example2.rb) to get a feel for what this is like.
 
 Known bugs
 ==========
