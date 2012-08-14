@@ -14,3 +14,10 @@ task :test do
 end
 
 
+task :build do
+  sh 'gem build *.gemspec'
+end
+
+task :install => :build do
+  sh 'gem install *.gem'
+end

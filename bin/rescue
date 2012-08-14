@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+require 'pry-capture'
+require 'pry-stack_explorer'
+
+USAGE = %{
+rescue (pry-rescue wrapper)
+
+Usage:
+  rescue <script.rb> [arguments...]
+
+What it does:
+  Runs <script.rb>, and if an uncaught exception is raised,
+  pry will come to the rescue, giving you a pry prompt in the
+  context where the exception was raised.
+
+  You can then poke around to figure out why your code broke!
+
+  (Not yet available: fixing the problem and continuing your program.)
+
+}
+
+if script = ARGV.shift
+  if File.exists? script
+    $0 = script
+    Pry.rescue { load script }
+  else
+    $stderr.puts "Error: #{script.inspect} not found."
+  end
+else
+  # Usage...
+  puts USAGE
+end
