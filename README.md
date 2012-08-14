@@ -1,5 +1,5 @@
-pry-rescue helps you quickly figure out why your code broke by opening a Pry session whenever an uncaught exception is raised.
 
+**pry-rescue** helps you quickly figure out why your code broke; whenever an exception is raised that would normally kill your program, Pry comes to the rescue, opening a Pry session in the context of code that raised the exception.
 
 Installation
 ============
