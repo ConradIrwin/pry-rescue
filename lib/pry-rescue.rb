@@ -2,15 +2,15 @@ require 'rubygems'
 require 'interception'
 require 'pry'
 
-require File.expand_path('../pry-capture/core_ext', __FILE__)
-require File.expand_path('../pry-capture/commands', __FILE__)
+require File.expand_path('../pry-rescue/core_ext', __FILE__)
+require File.expand_path('../pry-rescue/commands', __FILE__)
 
 begin
   require 'pry-stack_explorer'
 rescue LoadError
 end
 
-class PryCapture
+class PryRescue
   class << self
 
     # Start a Pry session in the context of the exception.

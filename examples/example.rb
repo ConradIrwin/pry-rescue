@@ -1,7 +1,7 @@
 $:.unshift File.expand_path '../../lib', __FILE__
-require 'pry-capture'
+require 'pry-rescue'
 
-Pry.capture do
+Pry.rescue do
 
   def a
     begin

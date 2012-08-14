@@ -3,12 +3,12 @@ class Pry
   # Start a pry session on any unhandled exceptions within this block.
   #
   # @example
-  #   Pry::capture do
+  #   Pry::rescue do
   #     raise "foo"
   #   end
   #
   # @return [Object] The return value of the block
-  def self.capture(&block)
+  def self.rescue(&block)
     raised = []
 
     Interception.listen(block) do |exception, binding|
@@ -20,7 +20,7 @@ class Pry
     end
 
   rescue Exception => e
-    PryCapture.enter_exception_context(raised)
+    PryRescue.enter_exception_context(raised)
     raise
   end
 end
