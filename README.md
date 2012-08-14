@@ -23,7 +23,7 @@ Way the First:
 
 Use the handy-dandy launcher script:
 
-  rescue <script.rb> [arguments..]
+```  rescue <script.rb> [arguments..]```
 
 Way the Second:
 ---------------
