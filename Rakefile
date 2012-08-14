@@ -13,7 +13,6 @@ task :test do
   sh 'rspec spec -r ./spec/spec_helpers.rb'
 end
 
-
 task :build do
   sh 'gem build *.gemspec'
 end

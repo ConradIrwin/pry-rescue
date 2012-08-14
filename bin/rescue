@@ -1,6 +1,4 @@
 #!/usr/bin/env ruby
-require 'pry-capture'
-require 'pry-stack_explorer'
 
 USAGE = %{
 rescue (pry-rescue wrapper)
@@ -21,6 +19,9 @@ What it does:
 
 if script = ARGV.shift
   if File.exists? script
+    require 'pry-rescue'
+    begin; require 'pry-stack_explorer'; rescue LoadError; end
+
     $0 = script
     Pry.rescue { load script }
   else

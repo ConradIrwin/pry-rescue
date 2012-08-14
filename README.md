@@ -1,4 +1,4 @@
-pry-rescue allows you to start a Pry session on any unhandled exceptions in your code.
+pry-rescue catches unhandled exceptions, and automatically launches a Pry session where the unhandled exception was raised.
 
 
 Installation
@@ -16,6 +16,17 @@ end
 Usage
 =====
 
+There are *two ways* to use pry-rescue:
+
+Way the First:
+--------------
+
+Use the handy-dandy launcher script:
+
+  rescue <script.rb> [arguments..]
+
+Way the Second:
+---------------
 In development, wrap your code in `Pry::rescue{ }`; then any exceptions that are raised
 but not rescued will open a pry session.
 
