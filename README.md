@@ -1,4 +1,4 @@
-pry-rescue catches unhandled exceptions, and automatically launches a Pry session where the unhandled exception was raised.
+pry-rescue helps you quickly figure out why your code broke by opening a Pry session whenever an uncaught exception is raised.
 
 
 Installation
