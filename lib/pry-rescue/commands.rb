@@ -32,11 +32,11 @@ Pry::Commands.create_command "cd-cause", "Move to the previously raised exceptio
 
   def process
     raised = target.eval("_raised_ rescue nil")
-    raise Pry::CommandError, "cd-cause only works in a pry session created by Pry::capture{}" unless raised
+    raise Pry::CommandError, "cd-cause only works in a pry session created by Pry::rescue{}" unless raised
     raised.pop
 
     if raised.any?
-      PryCapture.enter_exception_context(raised)
+      PryRescue.enter_exception_context(raised)
     else
       raise Pry::CommandError, "No previous exception detected"
     end
