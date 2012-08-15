@@ -17,9 +17,17 @@ class PryRescue
     # @param [Exception] exception The exception.
     # @param [Array<Binding>] bindings The call stack.
     def enter_exception_context(raised)
-      exception, bindings = raised.last
 
+      exception, bindings = raised.last
       prune_call_stack!(bindings)
+
+      # When we're in ./bin/rescue there seems to be an extra exception,
+      # we'll just ignore it so that the user lands in their own code.
+      if bindings.first.eval("__FILE__") == File.expand_path('../../bin/rescue', __FILE__)
+        raised.pop
+        exception, bindings = raised.last
+        prune_call_stack!(bindings)
+      end
 
       if defined?(PryStackExplorer)
         pry :call_stack => bindings, :hooks => pry_hooks(exception, raised)
