@@ -1,8 +1,9 @@
 
-**pry-rescue** helps you quickly figure out why your code broke; whenever an exception is raised that would normally kill your program, Pry comes to the rescue, opening a Pry session in the context of code that raised the exception.
+**pry-rescue** helps you quickly figure out why your code broke; when an exception is raised that would normally kill your program, Pry comes to the rescue, opening a Pry session in the context of code that raised the exception.
 
 Installation
 ============
+
 Either `gem install pry-rescue`, or add it to the development section of your Gemfile:
 
 ```ruby
@@ -18,17 +19,20 @@ Usage
 
 There are *two ways* to use pry-rescue:
 
-Way the First:
---------------
+Wrap an entire script
+---------------------
 
-Use the handy-dandy launcher script:
+Use the launcher script:
 
-```  rescue <script.rb> [arguments..]```
+```
+rescue <script.rb> [arguments..]
+```
 
-Way the Second:
----------------
+Wrap a block in your code
+-------------------------
 In development, wrap your code in `Pry::rescue{ }`; then any exceptions that are raised
-but not rescued will open a pry session.
+but not rescued will open a pry session. This is particularly useful for debugging
+servers and other long-running processes.
 
 ```ruby
 require 'pry-rescue'
@@ -60,6 +64,9 @@ from examples/example.rb:7:in `rescue in test'
 [1] pry(main)>
 ```
 
+cd-cause
+========
+
 If you need to find the reason that the exception happened, you can use the `cd-cause`
 command:
 
@@ -79,6 +86,27 @@ from examples/example.rb:5:in `test'
 ```
 
 To get back from `cd-cause` you can either type `<ctrl+d>` or `cd ..`.
+
+try-again
+=========
+
+Once you've used Pry's `edit` or `edit-method` commands to fix your code, you can issue a
+`try-again` command to re-run your code. (Either from the start in the case of using the
+`rescue` script, or from the block if you're using that API).
+
+```
+[1] pry(main)> edit-method
+[2] pry(main)> whereami
+From: examples/example.rb @ line 4 Object#test:
+
+    4: def test
+ => 5:   puts "foo"
+    6: rescue => e
+    7:   raise "bar"
+    8: end
+[3] pry(main)> try-again
+foo
+```
 
 pry-stack explorer
 ==================
