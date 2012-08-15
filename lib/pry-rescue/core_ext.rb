@@ -20,7 +20,11 @@ class Pry
     end
 
   rescue Exception => e
-    PryRescue.enter_exception_context(raised)
-    raise
+    case PryRescue.enter_exception_context(raised)
+    when :try_again
+      retry
+    else
+      raise
+    end
   end
 end

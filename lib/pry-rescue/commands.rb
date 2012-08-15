@@ -42,3 +42,24 @@ Pry::Commands.create_command "cd-cause", "Move to the previously raised exceptio
     end
   end
 end
+
+Pry::Commands.create_command "try-again", "Re-try the code that caused this exception" do
+
+  banner <<-BANNER
+    Usage: try-again
+
+    Runs the code wrapped by Pry::rescue{ } again.
+
+    This is useful if you've used `edit` or `edit-method` to fix the problem
+    that caused this exception to be raised and you want a quick way to test
+    your changes.
+
+    NOTE: try-again may cause confusing results if the code that's run have
+    side-effects (like deleting rows from a database) as it will try to do that
+    again, which may not work.
+  BANNER
+
+  def process
+    run "exit", ":try_again"
+  end
+end
