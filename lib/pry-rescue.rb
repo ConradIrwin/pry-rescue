@@ -21,9 +21,7 @@ class PryRescue
       exception, bindings = raised.last
       prune_call_stack!(bindings)
 
-      # When we're in ./bin/rescue there seems to be an extra exception,
-      # we'll just ignore it so that the user lands in their own code.
-      if bindings.first.eval("__FILE__") == File.expand_path('../../bin/rescue', __FILE__)
+      if bindings.size > 1 && internal_binding?(bindings.first)
         raised.pop
         exception, bindings = raised.last
         prune_call_stack!(bindings)
@@ -37,6 +35,11 @@ class PryRescue
     end
 
     private
+
+    # Is this binding within pry-rescue?
+    def internal_binding?(binding)
+      binding.eval("__FILE__").start_with?(File.expand_path('../../', __FILE__))
+    end
 
     # Define the :before_session hook for the Pry instance.
     # This ensures that the `_ex_` and `_raised_` sticky locals are
