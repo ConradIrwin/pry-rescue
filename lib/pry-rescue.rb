@@ -38,7 +38,8 @@ class PryRescue
 
     # Is this binding within pry-rescue?
     def internal_binding?(binding)
-      binding.eval("__FILE__").start_with?(File.expand_path('../../', __FILE__))
+      binding.eval("__FILE__").start_with?(File.expand_path('../../lib', __FILE__)) ||
+      binding.eval("__FILE__").start_with?(File.expand_path('../../bin', __FILE__))
     end
 
     # Define the :before_session hook for the Pry instance.
