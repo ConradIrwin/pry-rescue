@@ -31,7 +31,7 @@ Pry::Commands.create_command "cd-cause", "Move to the previously raised exceptio
   BANNER
 
   def process
-    raised = target.eval("_raised_ rescue nil")
+    raised = target.eval("_raised_.dup rescue nil")
     raise Pry::CommandError, "cd-cause only works in a pry session created by Pry::rescue{}" unless raised
     raised.pop
 
@@ -60,6 +60,6 @@ Pry::Commands.create_command "try-again", "Re-try the code that caused this exce
   BANNER
 
   def process
-    run "exit", ":try_again"
+    throw :try_again
   end
 end

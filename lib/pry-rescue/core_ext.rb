@@ -9,26 +9,28 @@ class Pry
   #
   # @return [Object] The return value of the block
   def self.rescue(&block)
-    return yield if @raised
-    @raised = []
+    raised = []
+    (@raised_stack ||= []) << raised
 
-    Interception.listen(block) do |exception, binding|
-      if defined?(PryStackExplorer)
-        @raised << [exception, binding.callers]
-      else
-        @raised << [exception, Array(binding)]
+    loop do
+      catch(:try_again) do
+        raised.clear
+        begin
+          return Interception.listen(block) do |exception, binding|
+                    if defined?(PryStackExplorer)
+                      raised << [exception, binding.callers]
+                    else
+                      raised << [exception, Array(binding)]
+                    end
+                  end
+        rescue Exception => e
+          PryRescue.enter_exception_context(raised)
+          raise e
+        end
       end
     end
-
-  rescue Exception => e
-    case PryRescue.enter_exception_context(@raised)
-    when :try_again
-      retry
-    else
-      raise
-    end
   ensure
-    @raised = nil
+    @raised_stack.pop
   end
 
   # Start a pry session on an exception that you rescued within a Pry::rescue{ }.
@@ -42,16 +44,13 @@ class Pry
   #     end
   #   end
   #
-  # TODO: You cannot use the 'try-again' command with Pry::rescued.
-  def self.rescued(e)
-    raise "Tried to inspect rescued exception outside Pry::rescue{ } block" unless @raised
+  def self.rescued(e=$!)
+    raise "Tried to inspect rescued exception outside Pry::rescue{ } block" unless @raised_stack.any?
 
-    raised = @raised.dup
+    raised = @raised_stack.last.dup
     raised.pop until raised.empty? || raised.last.first == e
-    raise "Tried to inspect an exception that was not raised" unless raised.any?
+    raise "Tried to inspect an exception that was not raised in this Pry::rescue{ } block" unless raised.any?
 
-    while PryRescue.enter_exception_context(raised) == :try_again
-      puts "Cannot try again from a rescued exception!"
-    end
+    PryRescue.enter_exception_context(raised)
   end
 end
