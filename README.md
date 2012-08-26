@@ -1,38 +1,18 @@
 
-**pry-rescue** helps you quickly figure out why your code broke; when an exception is raised that would normally kill your program, Pry comes to the rescue, opening a Pry session in the context of code that raised the exception.
-
-Installation
-============
-
-Either `gem install pry-rescue`, or add it to the development section of your Gemfile:
-
-```ruby
-source :rubygems
-group :development do
-  gem 'pry-rescue'
-  gem 'pry-stack_explorer' # if you're using MRI 1.9 and you want it to be awesome.
-end
-```
+**pry-rescue** super-fast, painless, debugging for the (ruby) masses. (See [Pry to the rescue!](https://cirw.in/blog/pry-to-the-rescue))
 
 Usage
 =====
 
-There are *two ways* to use pry-rescue:
-
-Wrap an entire script
----------------------
-
-Use the launcher script:
+First `gem install pry-rescue pry-stack_explorer`. Then run your program with `rescue`
+instead of `ruby`:
 
 ```
 rescue <script.rb> [arguments..]
 ```
 
-Wrap a block in your code
--------------------------
-In development, wrap your code in `Pry::rescue{ }`; then any exceptions that are raised
-but not rescued will open a pry session. This is particularly useful for debugging
-servers and other long-running processes.
+If you want more fine-grained control over which parts of your code are rescued, you can
+also use the block form:
 
 ```ruby
 require 'pry-rescue'
@@ -47,7 +27,6 @@ Pry.rescue do
   test
 end
 ```
-
 This will land you in a pry-session:
 
 ```
@@ -119,9 +98,8 @@ you can get a better idea of why your function ended up in a bad state. Run
 Known bugs
 ==========
 
-Occasionally, when using ruby-1.8 or jruby, the value for `self` will be incorrect. You
-will still be able to access local variables, but calling methods will not work as you
-expect.
+Occasionally, when using ruby-1.8 the value for `self` will be incorrect. You will still
+be able to access local variables, but calling methods will not work as you expect.
 
 On rbx we are unable to intercept some exceptions thrown from inside the C++ VM, for
 example the ZeroDivisionError in `1 / 0`.
