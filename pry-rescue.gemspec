@@ -10,5 +10,6 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.executables   = ['rescue']
 
+  s.add_dependency 'pry'
   s.add_dependency 'interception'
 end
