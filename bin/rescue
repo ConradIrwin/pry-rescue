@@ -23,7 +23,7 @@ if script = ARGV.shift
     begin; require 'pry-stack_explorer'; rescue LoadError; end
 
     $0 = File.expand_path script
-    Pry.rescue { load script }
+    PryRescue.load script
   else
     $stderr.puts "Error: #{script.inspect} not found."
   end
