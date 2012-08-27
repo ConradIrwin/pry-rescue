@@ -39,7 +39,6 @@ describe "PryRescue.load" do
       }.should raise_error(ArgumentError)
     end
 
-
     it "should open above gems" do
       PryRescue.should_receive(:pry).once do |opts|
         opts[:call_stack].first.eval("__FILE__").should start_with(Gem::Specification.detect{|x| x.name == 'coderay' }.full_gem_path)
@@ -47,6 +46,16 @@ describe "PryRescue.load" do
       lambda{
         PryRescue.load("spec/fixtures/coderay.rb")
       }.should raise_error(ArgumentError)
+    end
+
+    it "should filter out duplicate stack frames" do
+      PryRescue.should_receive(:pry).once do |opts|
+        opts[:call_stack][0].eval("__LINE__").should == 4
+        opts[:call_stack][1].eval("__LINE__").should == 12
+      end
+      lambda{
+        PryRescue.load("spec/fixtures/super.rb")
+      }.should raise_error(/fixtures.super/)
     end
   else
     it "should open at the correct point" do

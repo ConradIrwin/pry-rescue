@@ -26,7 +26,9 @@ class PryRescue
       exception, bindings = raised.last
 
       if defined?(PryStackExplorer)
-        pry :call_stack => bindings, :hooks => pry_hooks(exception, raised), :initial_frame => initial_frame(bindings)
+        pry :call_stack => without_duplicates(bindings),
+            :hooks => pry_hooks(exception, raised),
+            :initial_frame => initial_frame(bindings)
       else
         Pry.start bindings.first, :hooks => pry_hooks(exception, raised)
       end
@@ -82,6 +84,19 @@ class PryRescue
       end.drop_while do |b|
         b.eval("self") == Interception
       end
+    end
+
+    # Remove multiple bindings for the same function.
+    #
+    # @param [Array<Bindings>]
+    # @return [Array<Bindings>]
+    def without_duplicates(bindings)
+      bindings.zip([nil] + bindings).reject do |b, c|
+        # The eval('__method__') is there as a shortcut as loading a method
+        # from a binding is very slow.
+        c && (b.eval("__method__") == c.eval("__method__")) &&
+                    Pry::Method.from_binding(b) == Pry::Method.from_binding(c)
+      end.map(&:first)
     end
 
     # Define the :before_session hook for the Pry instance.
