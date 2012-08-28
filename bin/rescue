@@ -18,12 +18,10 @@ What it does:
 }
 
 if script = ARGV.shift
+  $0 = File.expand_path(script)
   if File.exists? script
-    require 'pry-rescue'
-    begin; require 'pry-stack_explorer'; rescue LoadError; end
-
-    $0 = File.expand_path script
-    PryRescue.load script
+    require File.expand_path('../../lib/pry-rescue.rb', __FILE__)
+    PryRescue.load $0
   else
     $stderr.puts "Error: #{script.inspect} not found."
   end
