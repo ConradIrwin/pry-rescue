@@ -1,5 +1,5 @@
+# Additional methods provided by pry-rescue.
 class Pry
-
   # Start a pry session on any unhandled exceptions within this block.
   #
   # @example
