@@ -1,0 +1,5 @@
+*.gem
+Gemfile.lock
+.rbx
+.yardoc
+doc
