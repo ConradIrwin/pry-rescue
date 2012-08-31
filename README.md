@@ -1,5 +1,5 @@
 
-**pry-rescue** super-fast, painless, debugging for the (ruby) masses. (See [Pry to the rescue!](https://cirw.in/blog/pry-to-the-rescue))
+**pry-rescue** super-fast, painless, debugging for the (ruby) masses. (See [Pry to the rescue!](http://cirw.in/blog/pry-to-the-rescue))
 
 Usage
 =====
