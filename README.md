@@ -11,6 +11,12 @@ instead of `ruby`:
 rescue <script.rb> [arguments..]
 ```
 
+If you're using Rack, you should use the middleware instead (though be careful to only
+include it in development!)
+```
+use PryRescue::Rack
+```
+
 If you want more fine-grained control over which parts of your code are rescued, you can
 also use the block form:
 

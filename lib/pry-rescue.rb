@@ -4,6 +4,7 @@ require 'pry'
 
 require File.expand_path('../pry-rescue/core_ext', __FILE__)
 require File.expand_path('../pry-rescue/commands', __FILE__)
+require File.expand_path('../pry-rescue/rack', __FILE__)
 
 begin
   require 'pry-stack_explorer'
