@@ -9,7 +9,7 @@ describe "PryRescue.load" do
       }
       lambda{
         PryRescue.load("spec/fixtures/simple.rb")
-      }.should raise_error(/fixtures.simple/)
+      }.should raise_error(/simple-exception/)
     end
 
     it "should open above the standard library" do
@@ -55,7 +55,7 @@ describe "PryRescue.load" do
       end
       lambda{
         PryRescue.load("spec/fixtures/super.rb")
-      }.should raise_error(/fixtures.super/)
+      }.should raise_error(/super-exception/)
     end
 
     it "should calculate correct initial frame even when duplicates are present" do
@@ -92,7 +92,7 @@ describe "PryRescue.load" do
       }
       lambda{
         PryRescue.load("spec/fixtures/simple.rb")
-      }.should raise_error(/fixtures.simple/)
+      }.should raise_error(/simple-exception/)
     end
   end
 end

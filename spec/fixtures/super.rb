@@ -1,7 +1,7 @@
 class A
   def a
     loop do
-      raise "fixtures/super"
+      raise "super-exception"
     end
   end
 end

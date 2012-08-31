@@ -1,1 +1,1 @@
-raise "fixtures/simple"
+raise "simple-exception"
