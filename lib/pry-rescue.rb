@@ -31,9 +31,10 @@ class PryRescue
 
       raised.pop if phantom_load_raise?(*raised.last)
       exception, bindings = raised.last
+      bindings = without_duplicates(bindings)
 
       if defined?(PryStackExplorer)
-        pry :call_stack => without_duplicates(bindings),
+        pry :call_stack => bindings,
             :hooks => pry_hooks(exception, raised),
             :initial_frame => initial_frame(bindings)
       else

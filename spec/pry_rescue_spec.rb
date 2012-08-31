@@ -57,6 +57,16 @@ describe "PryRescue.load" do
         PryRescue.load("spec/fixtures/super.rb")
       }.should raise_error(/fixtures.super/)
     end
+
+    it "should calculate correct initial frame even when duplicates are present" do
+      PryRescue.should_receive(:pry).once do |opts|
+        opts[:call_stack][0].eval("__FILE__").should end_with('fake.rb')
+        opts[:call_stack][opts[:initial_frame]].eval("__FILE__").should end_with('spec/fixtures/initial.rb')
+      end
+      lambda{
+        PryRescue.load("spec/fixtures/initial.rb")
+      }.should raise_error(/no :baz please/)
+    end
   else
     it "should open at the correct point" do
       Pry.should_receive(:start).once{ |binding, h|
