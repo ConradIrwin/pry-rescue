@@ -28,6 +28,7 @@ class PryRescue
       raised = raised.map do |e, bs|
         [e, without_bindings_below_raise(bs)]
       end
+      raised = without_gem_reraises(raised)
 
       raised.pop if phantom_load_raise?(*raised.last)
       exception, bindings = raised.last
@@ -107,6 +108,23 @@ class PryRescue
         c && (b.eval("__method__") == c.eval("__method__")) &&
                     Pry::Method.from_binding(b) == Pry::Method.from_binding(c)
       end.map(&:first)
+    end
+
+    # Remove any re-raises of the exact exception object that happened from within
+    # a gem, and show you only the raise that happened in your code.
+    #
+    # @param [Array<Exception, Array<Binding>>] raised  The exceptions raised
+    def without_gem_reraises(raised)
+      seen = {}
+      raised.select do |(e, bindings)|
+        if seen[e] && !user_path?(bindings.first.eval("__FILE__"))
+          false
+        elsif user_path?(bindings.first.eval("__FILE__"))
+          seen[e] = true
+        else
+          true
+        end
+      end
     end
 
     # Define the :before_session hook for the Pry instance.

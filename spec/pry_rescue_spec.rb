@@ -67,6 +67,24 @@ describe "PryRescue.load" do
         PryRescue.load("spec/fixtures/initial.rb")
       }.should raise_error(/no :baz please/)
     end
+
+    it "should skip over reraises from within gems" do
+      PryRescue.should_receive(:pry).once do |opts|
+        opts[:call_stack][0].eval("__FILE__").should end_with('spec/fixtures/reraise.rb')
+      end
+      lambda{
+        PryRescue.load("spec/fixtures/reraise.rb")
+      }.should raise_error(/reraise-exception/)
+    end
+
+    it "should not skip over independent raises within gems" do
+      PryRescue.should_receive(:pry).once do |opts|
+        opts[:call_stack][0].eval("__FILE__").should end_with('fake.rb')
+      end
+      lambda{
+        PryRescue.load("spec/fixtures/raiseother.rb")
+      }.should raise_error(/raiseother_exception/)
+    end
   else
     it "should open at the correct point" do
       Pry.should_receive(:start).once{ |binding, h|
