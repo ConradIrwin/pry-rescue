@@ -12,15 +12,15 @@ Pry::Commands.create_command "cd-cause", "Move to the previously raised exceptio
       5.    def foo
       6.      raise "one"
       7.    rescue
-      8. =>    raise "two"
+      8. =>   raise "two"
       9.    end
 
       pry> cd-cause
 
       5.    def foo
-      6. =>    raise "one"
+      6. =>   raise "one"
       7.    rescue
-      8.       raise "two"
+      8.      raise "two"
       9.    end
 
     Once you have finished with the internal exception type <ctrl+d> or cd .. to
