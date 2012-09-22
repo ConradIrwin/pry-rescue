@@ -60,6 +60,19 @@ describe 'Pry.rescue' do
       raise "foops" if @outer == 1
     end
   end
+
+  it "should enter the first occurence of an exception that is re-raised" do
+    PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 1 }
+    lambda do
+      Pry::rescue do
+        begin
+          raise "first_occurance"
+        rescue => e
+          raise
+        end
+      end
+    end.should  raise_error /first_occurance/
+  end
 end
 
 describe "Pry.rescued" do
