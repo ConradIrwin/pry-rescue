@@ -24,6 +24,8 @@ class PryRescue
     # Start a Pry session in the context of the exception.
     # @param [Array<Exception, Array<Binding>>] raised  The exceptions raised
     def enter_exception_context(raised)
+      @exception_context_depth ||= 0
+      @exception_context_depth += 1
 
       raised = raised.map do |e, bs|
         [e, without_bindings_below_raise(bs)]
@@ -41,12 +43,20 @@ class PryRescue
       else
         Pry.start bindings.first, :hooks => pry_hooks(exception, raised)
       end
+    ensure
+      @exception_context_depth -= 1
     end
 
     # Load a script wrapped in Pry::rescue{ }
     # @param [String] script  The name of the script
     def load(script)
       Pry::rescue{ Kernel.load script }
+    end
+
+    # Is the user currently inside pry rescue?
+    # @return [Boolean]
+    def in_exception_context?
+      @exception_context_depth && @exception_context_depth > 0
     end
 
     private

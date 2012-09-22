@@ -60,6 +60,7 @@ Pry::Commands.create_command "try-again", "Re-try the code that caused this exce
   BANNER
 
   def process
+    raise Pry::CommandError, "try-again only works in a pry session created by Pry::rescue{}" unless PryRescue.in_exception_context?
     throw :try_again
   end
 end
