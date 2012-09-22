@@ -1,5 +1,5 @@
 # Additional methods provided by pry-rescue.
-class Pry
+class << Pry
   # Start a pry session on any unhandled exceptions within this block.
   #
   # @example
@@ -8,29 +8,18 @@ class Pry
   #   end
   #
   # @return [Object] The return value of the block
-  def self.rescue(&block)
-    raised = []
-    (@raised_stack ||= []) << raised
-
+  def rescue(&block)
     loop do
       catch(:try_again) do
-        raised.clear
+        @raised = []
         begin
-          return Interception.listen(block) do |exception, binding|
-                    if defined?(PryStackExplorer)
-                      raised << [exception, binding.callers]
-                    else
-                      raised << [exception, Array(binding)]
-                    end
-                  end
+          return with_rescuing(&block)
         rescue Exception => e
-          PryRescue.enter_exception_context(raised)
+          rescued e
           raise e
         end
       end
     end
-  ensure
-    @raised_stack.pop
   end
 
   # Start a pry session on an exception that you rescued within a Pry::rescue{ }.
@@ -44,13 +33,38 @@ class Pry
   #     end
   #   end
   #
-  def self.rescued(e=$!)
-    raise "Tried to inspect rescued exception outside Pry::rescue{ } block" unless @raised_stack.any?
+  def rescued(e=$!)
+    if i = (@raised || []).index{ |(ee, _)| ee == e }
+      PryRescue.enter_exception_context(@raised[0..i])
+    else
+      raise "Tried to inspect an exception that was not raised in a Pry::rescue{ } block"
+    end
 
-    raised = @raised_stack.last.dup
-    raised.pop until raised.empty? || raised.last.first == e
-    raise "Tried to inspect an exception that was not raised in this Pry::rescue{ } block" unless raised.any?
+  ensure
+    @raised = []
+  end
 
-    PryRescue.enter_exception_context(raised)
+  private
+
+  # Ensure that Interception is active while running this block
+  #
+  # @param [Proc] &block  the block
+  def with_rescuing(&block)
+    if @rescuing
+      block.call
+    else
+      begin
+        @rescuing = true
+        Interception.listen(block) do |exception, binding|
+          if defined?(PryStackExplorer)
+            @raised << [exception, binding.callers]
+          else
+            @raised << [exception, Array(binding)]
+          end
+        end
+      ensure
+        @rescuing = false
+      end
+    end
   end
 end

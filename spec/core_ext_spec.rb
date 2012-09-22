@@ -46,11 +46,11 @@ describe 'Pry.rescue' do
     end
   end
 
-  it "should preserve exceptions between retrys at a higher level" do
+  it "should clear out exceptions between retrys at a higher level" do
     @outer = @inner = 0
     PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 1; throw :try_again }
     PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 1; throw :try_again }
-    PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 3; throw :try_again }
+    PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 1; throw :try_again }
     Pry::rescue do
       @outer += 1
       Pry::rescue do
@@ -70,7 +70,7 @@ describe "Pry.rescued" do
     rescue => e
       lambda{
         Pry.rescued(e)
-      }.should raise_error(/outside Pry::rescue/)
+      }.should raise_error(/Pry::rescue/)
     end
   end
 
