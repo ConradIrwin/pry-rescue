@@ -114,7 +114,7 @@ class PryRescue
       bindings.zip([nil] + bindings).reject do |b, c|
         # The eval('__method__') is there as a shortcut as loading a method
         # from a binding is very slow.
-        c && (b.eval("__method__") == c.eval("__method__")) &&
+        c && (b.eval("::Kernel.__method__") == c.eval("::Kernel.__method__")) &&
                     Pry::Method.from_binding(b) == Pry::Method.from_binding(c)
       end.map(&:first)
     end
