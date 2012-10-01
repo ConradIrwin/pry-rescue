@@ -5,9 +5,13 @@ require 'pry'
 require File.expand_path('../pry-rescue/core_ext', __FILE__)
 require File.expand_path('../pry-rescue/commands', __FILE__)
 require File.expand_path('../pry-rescue/rack', __FILE__)
+require File.expand_path('../pry-rescue/peek.rb', __FILE__)
 
 if ENV['PRY_RESCUE_RAILS']
   require File.expand_path('../pry-rescue/rails', __FILE__)
+end
+if ENV['PRY_PEEK']
+  PryRescue.peek_on_signal(ENV['PRY_PEEK'])
 end
 
 begin
