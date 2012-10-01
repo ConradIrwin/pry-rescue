@@ -119,6 +119,7 @@ From: examples/example.rb @ line 4 Object#test:
 foo
 ```
 
+<a name="peeking"/>
 Peeking
 =======
 
@@ -134,8 +135,8 @@ The next `^c` that program gets will start a Pry session at whatever instruction
 
 You can also implement this mechanism more broadly by:
 
-- `require 'pry-rescue'` then calling `PryRescue.peek\_on\_signal('INT')`
-- `require 'pry-rescue'` then having the `PRY\_PEEK=INT` env var set
+- `require 'pry-rescue'` then calling `PryRescue.peek_on_signal('INT')`
+- `require 'pry-rescue'` then having the `PRY_PEEK=INT` env var set
 - `export RUBYOPT=-rpry-rescue/peek/int`
 
 Note the drastic (dramatic? (game-change-tastic? (…bombastic?))) impact of the last one. It is implemented so that there is very low overhead, and can add pry-peek functionality to all of your Ruby apps. Just keep a terminal connected to the apps — whenever you want to peer into their inner world, send the signal.
