@@ -90,7 +90,8 @@ class PryRescue
     # @return [Boolean]
     def user_path?(file)
       !file.start_with?(RbConfig::CONFIG['libdir']) &&
-      !Gem::Specification.any?{ |gem| file.start_with?(gem.full_gem_path) }
+      !Gem::Specification.any?{ |gem| file.start_with?(gem.full_gem_path) } &&
+      !(file == '<internal:prelude>')
     end
 
     # Remove bindings that are part of Interception/Pry.rescue's internal
