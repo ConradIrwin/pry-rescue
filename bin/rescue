@@ -17,6 +17,11 @@ What it does:
 
 }
 
+if ARGV[0] == 'rails'
+  ENV['PRY_RESCUE_RAILS'] = 'true'
+  exec(*ARGV)
+end
+
 if script = ARGV.shift
   $0 = File.expand_path(script)
   if File.exists? script

@@ -6,6 +6,10 @@ require File.expand_path('../pry-rescue/core_ext', __FILE__)
 require File.expand_path('../pry-rescue/commands', __FILE__)
 require File.expand_path('../pry-rescue/rack', __FILE__)
 
+if ENV['PRY_RESCUE_RAILS']
+  require File.expand_path('../pry-rescue/rails', __FILE__)
+end
+
 begin
   require 'pry-stack_explorer'
 rescue LoadError
