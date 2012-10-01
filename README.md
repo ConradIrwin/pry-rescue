@@ -119,6 +119,32 @@ From: examples/example.rb @ line 4 Object#test:
 foo
 ```
 
+<a name="peeking"/>
+Peeking
+=======
+
+An new (read: unpredictable, but perhaps interesting) tooll is `pry-rescue/peek`.
+
+The idea of "peek"ing is that you can `pry` into places where you weren't originally invited, thanks to the wonders of Unix signals.
+
+Imagine you have a program that is hanging for some unknown reason. You can kill the program and rerun it like this:
+
+    ruby -rpry-rescue/peek/int some_program.rb
+
+The next `^c` that program gets will start a Pry session at whatever instruction it happened to be executing at that time.
+
+You can also implement this mechanism more broadly by:
+
+- `require 'pry-rescue'` then calling `PryRescue.peek_on_signal('INT')`
+- `require 'pry-rescue'` then having the `PRY_PEEK=INT` env var set
+- `export RUBYOPT=-rpry-rescue/peek/int`
+
+Note the drastic (dramatic? (game-change-tastic? (…bombastic?))) impact of the last one. It is implemented so that there is very low overhead, and can add pry-peek functionality to all of your Ruby apps. Just keep a terminal connected to the apps — whenever you want to peer into their inner world, send the signal.
+
+A simple example of a use case for this is to find out which unit test is slow by hitting `^c` on that one, slow ".". Another use case is when you want to pry into code that you don't have write permissions to. Another use case is when you're being too lazy to add the `require"pry";binding.pry` line somewhere. ☺
+
+A rather different use case is to trap the `EXIT` signal. This is available via `pry-rescue/peek/exit` (plus the other 2 interfaces, above). Note that this doesn't display local variable values like the other traps can. (TODO: find out if this is a hard limitation.)
+
 pry-stack explorer
 ==================
 
