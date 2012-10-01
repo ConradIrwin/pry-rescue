@@ -73,6 +73,25 @@ describe 'Pry.rescue' do
       end
     end.should  raise_error /first_occurance/
   end
+
+  it "should not catch SystemExit" do
+    PryRescue.should_not_receive(:enter_exception_context)
+
+    lambda do
+      Pry::rescue do
+        exit
+      end
+    end.should raise_error SystemExit
+  end
+
+  it 'should not catch Ctrl+C' do
+    PryRescue.should_not_receive(:enter_exception_context)
+    lambda do
+      Pry::rescue do
+        raise Interrupt, "ctrl+c (fake)"
+      end
+    end.should raise_error Interrupt
+  end
 end
 
 describe "Pry.rescued" do

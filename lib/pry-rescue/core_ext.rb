@@ -15,7 +15,7 @@ class << Pry
         begin
           return with_rescuing(&block)
         rescue Exception => e
-          rescued e
+          rescued e unless SystemExit === e || SignalException === e
           raise e
         end
       end
