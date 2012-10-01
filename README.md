@@ -11,6 +11,19 @@ instead of `ruby`:
 rescue <script.rb> [arguments..]
 ```
 
+If you're using Rails, you should add `pry-rescue` to the development section of your
+Gemspec and then run rails server using rescue:
+
+```
+rescue rails server
+```
+
+If you're using `bundle exec` the rescue should go after the exec:
+
+```
+bundle exec rescue rails server
+```
+
 If you're using Rack, you should use the middleware instead (though be careful to only
 include it in development!)
 ```
@@ -47,6 +60,19 @@ From: examples/example.rb @ line 4 Object#test:
 RuntimeError: bar
 from examples/example.rb:7:in `rescue in test'
 [1] pry(main)>
+```
+
+Finally. If you're doing your own exception handling, you can ask pry to open on an exception that you've caught.
+For this to work you must be inside a Pry::rescue{ } block.
+
+```ruby
+def test
+  raise "foo"
+rescue => e
+  Pry::rescued(e)
+end
+
+Pry::rescue{ test }
 ```
 
 cd-cause
@@ -97,18 +123,20 @@ pry-stack explorer
 ==================
 
 If you're running rubinius, or ruby-1.9, then you can use `pry-rescue` alongside
-`pry-stack_explorer`. This gives you the ability to move `up` or `down` the stack so that
+`pry-stack\_explorer`. This gives you the ability to move `up` or `down` the stack so that
 you can get a better idea of why your function ended up in a bad state. Run
 [example2.rb](https://github.com/ConradIrwin/pry-rescue/blob/master/examples/example2.rb) to get a feel for what this is like.
 
 Known bugs
 ==========
 
-Occasionally, when using ruby-1.8 the value for `self` will be incorrect. You will still
-be able to access local variables, but calling methods will not work as you expect.
-
-On rbx we are unable to intercept some exceptions thrown from inside the C++ VM, for
-example the ZeroDivisionError in `1 / 0`.
+* ruby 2.0, 1.9.3, 1.9.2 – no known bugs
+* ruby 1.9.1 — not supported
+* ruby 1.8.7 — occasional incorrect values for self
+* ree 1.8.7 — no known bugs
+* jruby 1.7 (1.8 mode and 1.9 mode) — no known bugs
+* jruby 1.6 (1.8 mode and 1.9 mode) — incorrect value for self in NoMethodErrors
+* rbx (1.8 mode and 1.9 mode) – does not catch some low-level errors (e.g. ZeroDivisionError)
 
 Meta-fu
 =======

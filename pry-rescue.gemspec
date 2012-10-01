@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name          = 'pry-rescue'
-  s.version       = '0.8'
+  s.version       = '0.9'
   s.summary       = 'Open a pry session on any unhandled exceptions'
   s.description   = 'Allows you to wrap code in Pry::rescue{ } to open a pry session at any unhandled exceptions'
   s.homepage      = 'https://github.com/ConradIrwin/pry-rescue'
@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.executables   = ['rescue']
 
   s.add_dependency 'pry'
-  s.add_dependency 'interception'
+  s.add_dependency 'interception', '>= 0.3'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'yard'
