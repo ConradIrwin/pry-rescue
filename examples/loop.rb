@@ -10,7 +10,7 @@ require 'pry-rescue'
 def r
   some_var = 13
   loop do
-    x = File.readlines('lib/pry-rescue.rb')
+    x = File.readlines(__FILE__)
   end
 end
 r
