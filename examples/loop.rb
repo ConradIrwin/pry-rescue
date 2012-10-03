@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require 'pry-rescue'
 
 # Peeking example! Try running this example with:
 #

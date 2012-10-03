@@ -10,7 +10,12 @@ require File.expand_path('../pry-rescue/peek.rb', __FILE__)
 if ENV['PRY_RESCUE_RAILS']
   require File.expand_path('../pry-rescue/rails', __FILE__)
 end
-if ENV['PRY_PEEK']
+case ENV['PRY_PEEK']
+when nil
+  PryRescue.peek_on_signal('USR2')
+when ''
+  # explicitly disable USR2.
+else
   PryRescue.peek_on_signal(ENV['PRY_PEEK'])
 end
 
