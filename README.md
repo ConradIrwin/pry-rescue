@@ -123,27 +123,56 @@ foo
 Peeking
 =======
 
-An new (read: unpredictable, but perhaps interesting) tooll is `pry-rescue/peek`.
+Someones bugs in your program don't cause exceptions. Instead your program just gets
+stuck. Examples include infinite loops, slow network calls, or badly backtracking
+parsers.
 
-The idea of "peek"ing is that you can `pry` into places where you weren't originally invited, thanks to the wonders of Unix signals.
+In this case it's useful to be able to open a pry console when you notice that your
+program is not going anywhere. To enable this feature you need to run:
 
-Imagine you have a program that is hanging for some unknown reason. You can kill the program and rerun it like this:
+```
+rescue --peek <script.rb>
+```
 
-    ruby -rpry-rescue/peek/int some_program.rb
+Then hit `<ctrl+c>` at any time to stop your program and have a peek at what it's actually
+doing. Hitting `<ctrl-c>` a second time will quit your program, if that's what you were
+trying to do.
 
-The next `^c` that program gets will start a Pry session at whatever instruction it happened to be executing at that time.
+Advanced peeking
+================
 
-You can also implement this mechanism more broadly by:
+It's tedious to have to remember to always start your program with `rescue --peek`. To
+this end, there are two ways to make peeking happen automatically.
 
-- `require 'pry-rescue'` then calling `PryRescue.peek_on_signal('INT')`
-- `require 'pry-rescue'` then having the `PRY_PEEK=INT` env var set
-- `export RUBYOPT=-rpry-rescue/peek/int`
+Firstly, if you want to always be able to peek a given program, just explicitly require
+this functionality at the start of that program.
 
-Note the drastic (dramatic? (game-change-tastic? (…bombastic?))) impact of the last one. It is implemented so that there is very low overhead, and can add pry-peek functionality to all of your Ruby apps. Just keep a terminal connected to the apps — whenever you want to peer into their inner world, send the signal.
+```ruby
+require "pry-rescue/peek/int"
+```
 
-A simple example of a use case for this is to find out which unit test is slow by hitting `^c` on that one, slow ".". Another use case is when you want to pry into code that you don't have write permissions to. Another use case is when you're being too lazy to add the `require"pry";binding.pry` line somewhere. ☺
+Secondly, if you want to always be able to peek any program, without changing the code,
+you can configure ruby to do this automatically. To do so, set RUBYOPT in your `~/.bashrc`
+(or equivalent).
 
-A rather different use case is to trap the `EXIT` signal. This is available via `pry-rescue/peek/exit` (plus the other 2 interfaces, above). Note that this doesn't display local variable values like the other traps can. (TODO: find out if this is a hard limitation.)
+```bash
+export RUBYOPT="-rpry-rescue/peek/int"
+```
+
+If you like the idea of peeking but don't want it to interfere with the normal purpose of
+`<ctrl+c>` then you can ask pry-rescue to listen to SIGUSR1 or SIGUSR2 instead by just
+changing the path that you require.
+
+```ruby
+require "pry-rescue/peek/usr1"
+require "pry-rescue/peek/usr2"
+```
+
+To send a SIGUSR1 to a process you can use the kill command.
+
+```bash
+kill -USR1 <process-id>
+```
 
 pry-stack explorer
 ==================
