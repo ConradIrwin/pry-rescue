@@ -4,7 +4,7 @@ USAGE = %{
 rescue (pry-rescue wrapper)
 
 Usage:
-  rescue <script.rb> [arguments...]
+  rescue [--peek] <script.rb> [arguments...]
 
 What it does:
   Runs <script.rb>, and if an uncaught exception is raised,
@@ -13,9 +13,25 @@ What it does:
 
   You can then poke around to figure out why your code broke!
 
-  (Not yet available: fixing the problem and continuing your program.)
+  If --peek is specified, then you can hit <Ctrl+C> to interrupt
+  your program and open a pry session at any time you need.
 
+  See the README (http://bitly.com/pry-rescue) for more.
 }
+case ARGV[0]
+when '-h', '--help'
+  puts USAGE
+  exit
+when /\A--peek\z/
+  ARGV.shift
+  ENV['PRY_PEEK'] = 'INT'
+  require "pry-rescue/peek/int"
+when '--'
+  ARGV.shift
+when /\A-/
+  puts USAGE
+  exit
+end
 
 if ARGV[0] == 'rails'
   ENV['PRY_RESCUE_RAILS'] = 'true'
