@@ -123,9 +123,9 @@ foo
 Peeking
 =======
 
-Someones bugs in your program don't cause exceptions. Instead your program just gets
-stuck. Examples include infinite loops, slow network calls, or badly backtracking
-parsers.
+Sometimes bugs in your program don't cause exceptions. Instead your program just gets
+stuck. Examples include infinite loops, slow network calls, or tests that take a
+suprisingly long time to run.
 
 In this case it's useful to be able to open a pry console when you notice that your
 program is not going anywhere. To enable this feature you need to run:
