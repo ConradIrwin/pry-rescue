@@ -138,40 +138,83 @@ Then hit `<ctrl+c>` at any time to stop your program and have a peek at what it'
 doing. Hitting `<ctrl-c>` a second time will quit your program, if that's what you were
 trying to do.
 
+Automatic peeking
+=================
+
+Remembering to run your program with `rescue --peek` manually is a bit frustrating (as you
+don't know you need to peek, until you need to peek) and so pry-rescue also allows you to
+peek into any program at any time by sending it a `SIGUSR2` signal.
+
+The easiest way to do this is to hit `<ctrl-z>` to interrupt your program, then type
+`kill -SIGUSR2 %1 && fg` into bash. For example:
+
+<!-- TODO syntax highlighting! -->
+```
+cirwin@localhost:/tmp/pry $ ruby examples/loop.rb
+^Z
+cirwin@localhost:/tmp/pry $ kill -SIGUSR2 %1 && fg
+[1]  + continued  ./examples/loop.rb
+Preparing to peek via pry!
+Frame number: 0/4
+
+From: ./examples/loop.rb @ line 10 Object#r
+    10: def r
+    11:   some_var = 13
+    12:   loop do
+ => 13:     x = File.readlines('lib/pry-rescue.rb')
+    14:   end
+    15: end
+pry (main)>
+```
+
+If you find that that's a bit hard to remember (I know I do), then you can make it easier
+by adding the following alias to your `~/.bashrc` or similar:
+
+```
+alias peek='kill -SIGUSR2 %1 && fg'
+```
+
+Then you can just type `peek` instead of `kill -SIGUSR2 %1 && fg`
+
 Advanced peeking
 ================
 
-It's tedious to have to remember to always start your program with `rescue --peek`. To
-this end, there are two ways to make peeking happen automatically.
+You can configure which signal pry-rescue listens for by default by exporting the PRY_PEEK
+environment variable that suits your use-case best:
 
-Firstly, if you want to always be able to peek a given program, just explicitly require
-this functionality at the start of that program.
+```
+export PRY_PEEK=""    # don't autopeek at all
+export PRY_PEEK=INT   # peek on SIGINT (<ctrl+c>)
+export PRY_PEEK=USR1  # peek on SIGUSR1
+export PRY_PEEK=USR2  # peek on SIGUSR2
+export PRY_PEEK=EXIT  # peek on program exit
+```
+
+If it's only important for one program, then you can also set the environment variable in
+ruby before requiring pry-rescue
 
 ```ruby
-require "pry-rescue/peek/int"
+ENV['PRY_PEEK'] = '' # disable SIGUSR2 handler
+require "pry-rescue"
 ```
 
-Secondly, if you want to always be able to peek any program, without changing the code,
-you can configure ruby to do this automatically. To do so, set RUBYOPT in your `~/.bashrc`
-(or equivalent).
+Finally, you can enable peeking into programs that do not include pry-rescue by
+configuring ruby to always load one (or several) of these files:
 
-```bash
-export RUBYOPT="-rpry-rescue/peek/int"
+```
+export RUBYOPT=-rpry-rescue/peek/int   # peek on SIGINT (<ctrl-c>)
+export RUBYOPT=-rpry-rescue/peek/usr1  # peek on SIGUSR1
+export RUBYOPT=-rpry-rescue/peek/usr2  # peek on SIGUSR2
+export RUBYOPT=-rpry-rescue/peek/exit  # peek on program exit
 ```
 
-If you like the idea of peeking but don't want it to interfere with the normal purpose of
-`<ctrl+c>` then you can ask pry-rescue to listen to SIGUSR1 or SIGUSR2 instead by just
-changing the path that you require.
+These last examples relies on having pry-rescue in the load path (i.e. at least in the
+gemset, or Gemfile of the program). If that is not true, you can use absolute paths. The
+hook files do not require the whole of pry-rescue, nor is any of pry itself loaded until
+you trigger the signal.
 
-```ruby
-require "pry-rescue/peek/usr1"
-require "pry-rescue/peek/usr2"
 ```
-
-To send a SIGUSR1 to a process you can use the kill command.
-
-```bash
-kill -USR1 <process-id>
+export RUBYOPT=-r/home/cirwin/src/pry-rescue/lib/pry-rescue/peek/usr2
 ```
 
 pry-stack explorer
