@@ -98,8 +98,22 @@ class PryRescue
     # @return [Boolean]
     def user_path?(file)
       !file.start_with?(RbConfig::CONFIG['libdir']) &&
-      !Gem::Specification.any?{ |gem| file.start_with?(gem.full_gem_path) } &&
+      !gem_path?(file) &&
       !(file == '<internal:prelude>')
+    end
+
+    # Is this path included in a gem?
+    #
+    # @param [String] file  the absolute path
+    # @return [Boolean]
+    def gem_path?(file)
+      # rubygems 1.8
+      if Gem::Specification.respond_to?(:any?)
+        Gem::Specification.any?{ |gem| file.start_with?(gem.full_gem_path) }
+      # rubygems 1.6
+      else
+        Gem.all_load_paths.any?{ |path| file.start_with?(path) }
+      end
     end
 
     # Remove bindings that are part of Interception/Pry.rescue's internal

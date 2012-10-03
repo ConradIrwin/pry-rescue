@@ -41,7 +41,11 @@ describe "PryRescue.load" do
 
     it "should open above gems" do
       PryRescue.should_receive(:pry).once do |opts|
-        opts[:call_stack].first.eval("__FILE__").should start_with(Gem::Specification.detect{|x| x.name == 'coderay' }.full_gem_path)
+        coderay_path = Gem::Specification.respond_to?(:detect) ?
+                         Gem::Specification.detect{|x| x.name == 'coderay' }.full_gem_path :
+                         Gem.all_load_paths.grep(/coderay/).last
+
+        opts[:call_stack].first.eval("__FILE__").should start_with(coderay_path)
       end
       lambda{
         PryRescue.load("spec/fixtures/coderay.rb")
