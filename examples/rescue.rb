@@ -1,5 +1,12 @@
+#!/usr/bin/env ruby
 # Slightly silly example written for http://cirw.in/blog/pry-to-the-rescue
 # (NOTE: the solution in the blog post only works on ruby-1.9)
+#
+# try running this with: rescue ./examples/rescue.rb
+#
+# When pry opens, see if you can use edit-method and try-again to fix the
+# code and test that your code works.
+#
 def find_capitalized(a)
   a.select do |name|
     name.chars.first == name.chars.first.upcase
