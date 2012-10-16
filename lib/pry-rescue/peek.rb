@@ -1,8 +1,6 @@
 class PryRescue
   def self.peek_on_signal signal
     trap signal, &method(:peek!)
-  rescue ArgumentError => e
-    warn "This OS says, '#{e}' (continuing without pry-rescue peeking)"
   end
 
   # Called when rescue --peek is used and the user hits <Ctrl+C>
