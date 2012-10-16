@@ -12,8 +12,7 @@ if ENV['PRY_RESCUE_RAILS']
 end
 case ENV['PRY_PEEK']
 when nil
-  failure = /win|mingw/
-  PryRescue.peek_on_signal('USR2') unless RUBY_PLATFORM[failure]
+  PryRescue.peek_on_signal('USR2') unless Pry::Helpers::BaseHelpers.windows?
 when ''
   # explicitly disable USR2.
 else
