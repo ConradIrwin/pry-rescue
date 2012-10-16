@@ -44,6 +44,29 @@ class << Pry
     @raised = []
   end
 
+  # Allow Pry::rescued(e) to work at any point in your program.
+  #
+  # @example
+  #   Pry::enable_rescuing!
+  #
+  #   begin
+  #     raise "foo"
+  #   rescue => e
+  #     Pry::rescued(e)
+  #   end
+  #
+  def enable_rescuing!
+    @raised = []
+    @rescuing = true
+    Interception.listen do |exception, binding|
+      if defined?(PryStackExplorer)
+        @raised << [exception, binding.callers]
+      else
+        @raised << [exception, Array(binding)]
+      end
+    end
+  end
+
   private
 
   # Ensure that Interception is active while running this block
