@@ -128,32 +128,11 @@ stuck. Examples include infinite loops, slow network calls, or tests that take a
 suprisingly long time to run.
 
 In this case it's useful to be able to open a pry console when you notice that your
-program is not going anywhere. To enable this feature you need to run:
+program is not going anywhere. To do this, send your process a `SIGQUIT` using `<ctrl+\>`.
 
-```
-rescue --peek <script.rb>
-```
-
-Then hit `<ctrl+c>` at any time to stop your program and have a peek at what it's actually
-doing. Hitting `<ctrl-c>` a second time will quit your program, if that's what you were
-trying to do.
-
-Automatic peeking
-=================
-
-Remembering to run your program with `rescue --peek` manually is a bit frustrating (as you
-don't know you need to peek, until you need to peek) and so pry-rescue also allows you to
-peek into any program at any time by sending it a `SIGUSR2` signal.
-
-The easiest way to do this is to hit `<ctrl-z>` to interrupt your program, then type
-`kill -SIGUSR2 %1 && fg` into bash. For example:
-
-<!-- TODO syntax highlighting! -->
 ```
 cirwin@localhost:/tmp/pry $ ruby examples/loop.rb
-^Z
-cirwin@localhost:/tmp/pry $ kill -SIGUSR2 %1 && fg
-[1]  + continued  ./examples/loop.rb
+^\
 Preparing to peek via pry!
 Frame number: 0/4
 
@@ -167,15 +146,6 @@ From: ./examples/loop.rb @ line 10 Object#r
 pry (main)>
 ```
 
-If you find that that's a bit hard to remember (I know I do), then you can make it easier
-by adding the following alias to your `~/.bashrc` or similar:
-
-```
-alias peek='kill -SIGUSR2 %1 && fg'
-```
-
-Then you can just type `peek` instead of `kill -SIGUSR2 %1 && fg`
-
 Advanced peeking
 ================
 
@@ -185,6 +155,7 @@ environment variable that suits your use-case best:
 ```
 export PRY_PEEK=""    # don't autopeek at all
 export PRY_PEEK=INT   # peek on SIGINT (<ctrl+c>)
+export PRY_PEEK=QUIT  # peek on SIGQUIT
 export PRY_PEEK=USR1  # peek on SIGUSR1
 export PRY_PEEK=USR2  # peek on SIGUSR2
 export PRY_PEEK=EXIT  # peek on program exit
@@ -194,7 +165,7 @@ If it's only important for one program, then you can also set the environment va
 ruby before requiring pry-rescue
 
 ```ruby
-ENV['PRY_PEEK'] = '' # disable SIGUSR2 handler
+ENV['PRY_PEEK'] = '' # disable SIGQUIT handler
 require "pry-rescue"
 ```
 
@@ -203,6 +174,7 @@ configuring ruby to always load one (or several) of these files:
 
 ```
 export RUBYOPT=-rpry-rescue/peek/int   # peek on SIGINT (<ctrl-c>)
+export RUBYOPT=-rpry-rescue/peek/quit  # peek on SIGQUIT (<ctrl-\>)
 export RUBYOPT=-rpry-rescue/peek/usr1  # peek on SIGUSR1
 export RUBYOPT=-rpry-rescue/peek/usr2  # peek on SIGUSR2
 export RUBYOPT=-rpry-rescue/peek/exit  # peek on program exit

@@ -22,10 +22,6 @@ case ARGV[0]
 when '-h', '--help'
   puts USAGE
   exit
-when /\A--peek\z/
-  ARGV.shift
-  ENV['PRY_PEEK'] = 'INT'
-  require "pry-rescue/peek/int"
 when '--'
   ARGV.shift
 when /\A-/
