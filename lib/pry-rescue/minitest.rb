@@ -1,3 +1,4 @@
+require 'pry-rescue'
 # TODO: it should be possible to do all this by simply wrapping
 # MiniTest::Unit::TestCase in recent versions of minitest.
 # Unfortunately the version of minitest bundled with ruby seems to
