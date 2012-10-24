@@ -104,7 +104,7 @@ class PryRescue
     def user_path?(file)
       !file.start_with?(RbConfig::CONFIG['libdir']) &&
       !gem_path?(file) &&
-      !(file == '<internal:prelude>')
+      !%w( (eval) <internal:prelude> ).include?(file)
     end
 
     # Is this path included in a gem?
