@@ -37,7 +37,14 @@ class << Pry
     if i = (@raised || []).index{ |(ee, _)| ee == e }
       PryRescue.enter_exception_context(@raised[0..i])
     else
-      raise "Tried to inspect an exception that was not raised in a Pry::rescue{ } block"
+      raise <<-EOERR
+
+#{(e.backtrace || []).join "\n"}
+
+Tried to inspect an exception that was not raised in a Pry::rescue{ } block
+
+  Exception: #{e}
+      EOERR
     end
 
   ensure
