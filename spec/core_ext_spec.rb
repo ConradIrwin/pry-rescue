@@ -98,16 +98,11 @@ describe "Pry.rescued" do
 
   it "should raise an error if used outwith Pry::rescue" do
     begin
-      1/0; culprit_line = __LINE__
+      raise "foo"
     rescue => e
       lambda{
         Pry.rescued(e)
-      }.should raise_error { |e|
-        m = e.message
-        e =~ /divided by 0/
-        e =~ /{__FILE__}.*#{culprit_line}/
-        e =~ /{__FILE__}.*#{culprit_line}/
-      }
+      }.should raise_error(/Pry::rescue/)
     end
   end
 
@@ -129,6 +124,5 @@ describe "Pry.rescued" do
       end
     end
   end
-
 end
 
