@@ -100,17 +100,15 @@ describe "Pry.rescued" do
     begin
       raise "foo"
     rescue => e
-      lambda{
-        Pry.rescued(e)
-      }.should raise_error(/Pry::rescue/)
+      Pry.should_receive(:warn)
+      Pry.rescued(e)
     end
   end
 
   it "should raise an error if used on an exception not raised" do
     Pry::rescue do
-      lambda{
-        Pry.rescued(RuntimeError.new("foo").exception)
-      }.should raise_error(/not raised/)
+      Pry.should_receive(:warn).with("WARNING: Tried to inspect an exception that was not raised within Pry::rescue{ }")
+      Pry.rescued(RuntimeError.new("foo").exception)
     end
   end
 
