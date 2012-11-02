@@ -37,6 +37,7 @@ class << Pry
     if i = (@raised || []).index{ |(ee, _)| ee == e }
       PryRescue.enter_exception_context(@raised[0..i])
     else
+      stack = "\n" + e.backtrace.join("\n")
       case e
       when SystemStackError
         # Interception cannot reliably interept SystemStackErrors as it needs
@@ -44,14 +45,15 @@ class << Pry
         # We use a special error message here, as it seems nicer to assume that
         # the user knows what they are doing, and it's the software that's
         # terrible.
-        warn "WARNING: Insufficient stack space to inspect exception"
+        warn "WARNING: Insufficient stack space to inspect exception" + stack
       else
         # We used to raise an exception at this point, but that turned out to
         # not be very helpful as it obscured the original cause of the problem.
         # I considered adding an explicit 'raise e' here, but decided against
         # it on the grounds that the Pry::rescued call is normally in someone
         # else's error handler already.
-        warn "WARNING: Tried to inspect an exception that was not raised within Pry::rescue{ }"
+        warn "WARNING: Tried to inspect exception outside of Pry::rescue{ }" + \
+          stack
       end
     end
 
