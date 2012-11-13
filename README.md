@@ -119,7 +119,32 @@ From: examples/example.rb @ line 4 Object#test:
 foo
 ```
 
+<a name="testing">
+Testing
+=======
+
+Pry-rescue comes with beta support for minitest and rspec, please feel free to try these
+out, and leave bug reports if something is not working.
+
+### rspec
+
+Just add the following to your `spec_helper.rb` or to the top of your test file.
+
+```ruby
+require 'pry-rescue/rspec'
+```
+
+### minitest
+
+Just after you `require "minitest/autorun"` also require `pry-rescue/minitest`.
+
+```ruby
+require 'minitest/autorun'
+require 'pry-rescue/minitest'
+```
+
 <a name="peeking"/>
+
 Peeking
 =======
 
