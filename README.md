@@ -119,31 +119,40 @@ From: examples/example.rb @ line 4 Object#test:
 foo
 ```
 
-<a name="testing">
 Testing
 =======
 
-Pry-rescue comes with beta support for minitest and rspec, please feel free to try these
-out, and leave bug reports if something is not working.
+Pry-rescue comes with beta support for minitest and rspec: test failures will
+drop you into pry at that location.  Please feel free to try these out, and
+leave bug reports if something is not working.
 
-### rspec
-
-Just add the following to your `spec_helper.rb` or to the top of your test file.
-
-```ruby
-require 'pry-rescue/rspec'
-```
+Note that for either of these, you will find `exit!` very handy: there is a pry
+`exit` command that will merely drop you into the next failure.
 
 ### minitest
 
-Just after you `require "minitest/autorun"` also require `pry-rescue/minitest`.
+Add the following to your `test_helper.rb` or to the top of your test file.
 
 ```ruby
 require 'minitest/autorun'
 require 'pry-rescue/minitest'
 ```
 
-<a name="peeking"/>
+Then, when you have a failure, you can use `edit`, `edit -c`, and `edit-method`, then
+`try-again` to re-run the tests, or run it by name (`test_foo`).
+
+### rspec
+
+Add the following to your `spec_helper.rb` or to the top of your test file.
+
+```ruby
+require 'pry-rescue/rspec'
+```
+
+Note that, unlike minitest, rspec creates odd structures instead of classes, so
+it is somewhat resistant to live-coding practices. In particular,  `edit -c` to
+edit the test then `try-again` doesn't work (so you'll have to `exit!`).
+
 
 Peeking
 =======
