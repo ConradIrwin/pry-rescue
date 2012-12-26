@@ -48,12 +48,14 @@ class PryRescue
       exception, bindings = raised.last
       bindings = without_duplicates(bindings)
 
-      if defined?(PryStackExplorer)
-        pry :call_stack => bindings,
-            :hooks => pry_hooks(exception, raised),
-            :initial_frame => initial_frame(bindings)
-      else
-        Pry.start bindings.first, :hooks => pry_hooks(exception, raised)
+      with_program_name "#$PROGRAM_NAME [in pry-rescue @ #{Dir.pwd}]" do
+        if defined?(PryStackExplorer)
+          pry :call_stack => bindings,
+              :hooks => pry_hooks(exception, raised),
+              :initial_frame => initial_frame(bindings)
+        else
+          Pry.start bindings.first, :hooks => pry_hooks(exception, raised)
+        end
       end
     ensure
       @exception_context_depth -= 1
@@ -163,6 +165,14 @@ class PryRescue
       end
 
       hooks
+    end
+
+    def with_program_name name
+      before = $PROGRAM_NAME
+      $PROGRAM_NAME = name
+      yield
+    ensure
+      $PROGRAM_NAME = before
     end
   end
 end
