@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.authors       = ['Conrad Irwin', 'banisterfiend', 'epitron']
   s.files         = `git ls-files`.split("\n")
   s.require_paths = ['lib']
-  s.executables   = ['rescue']
+  s.executables   = s.files.grep(%r{^bin/}).map{|f| File.basename f}
 
   s.add_dependency 'pry'
   s.add_dependency 'interception', '>= 0.3'
