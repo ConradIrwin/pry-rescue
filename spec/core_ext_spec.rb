@@ -107,7 +107,9 @@ describe "Pry.rescued" do
 
   it "should raise an error if used on an exception not raised" do
     Pry::rescue do
-      Pry.should_receive(:warn).with("WARNING: Tried to inspect an exception that was not raised within Pry::rescue{ }")
+      Pry.should_receive(:warn) do |message|
+        message.should =~ /^WARNING: Tried to inspect exception outside of Pry::rescue/
+      end
       Pry.rescued(RuntimeError.new("foo").exception)
     end
   end

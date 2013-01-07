@@ -37,7 +37,8 @@ class << Pry
     if i = (@raised || []).index{ |(ee, _)| ee == e }
       PryRescue.enter_exception_context(@raised[0..i])
     else
-      stack = "\n" + e.backtrace.join("\n")
+      stack = ''
+      stack = "\n" + e.backtrace.join("\n") if e.backtrace
       case e
       when SystemStackError
         # Interception cannot reliably interept SystemStackErrors as it needs
