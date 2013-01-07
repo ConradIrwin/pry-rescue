@@ -104,6 +104,8 @@ class PryRescue
     # @param [String] file  the absolute path
     # @return [Boolean]
     def user_path?(file)
+      return false if file.match(%r(/vendor/))
+      return true if file.match(Dir.pwd)
       !file.start_with?(RbConfig::CONFIG['libdir']) &&
       !gem_path?(file) &&
       !%w( (eval) <internal:prelude> ).include?(file)

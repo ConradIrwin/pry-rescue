@@ -52,6 +52,12 @@ describe "PryRescue.load" do
       }.should raise_error(ArgumentError)
     end
 
+    it "should skip pwd, even if it is a gem (but not vendor stuff)" do
+      Gem::Specification.stub :any? do true end
+      PryRescue.send(:user_path?, Dir.pwd + '/asdf.rb').should be_true
+      PryRescue.send(:user_path?, Dir.pwd + '/vendor/asdf.rb').should be_false
+    end
+
     it "should filter out duplicate stack frames" do
       PryRescue.should_receive(:pry).once do |opts|
         opts[:call_stack][0].eval("__LINE__").should == 4
