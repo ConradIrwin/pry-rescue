@@ -104,11 +104,21 @@ class PryRescue
     # @param [String] file  the absolute path
     # @return [Boolean]
     def user_path?(file)
-      return false if file.match(%r(/vendor/))
-      return true if file.match(Dir.pwd)
-      !file.start_with?(RbConfig::CONFIG['libdir']) &&
-      !gem_path?(file) &&
-      !%w( (eval) <internal:prelude> ).include?(file)
+      return true  if current_path?(file)
+      return false if stdlib_path?(file) || gem_path?(file)
+      true
+    end
+
+    # Is this file definitely part of the codebase the user is working on?
+    #
+    # This function exists because sometimes Dir.pwd can be a gem_path?,
+    # and the user expects to be able to debug a gem when they're cd'd
+    # into it.
+    #
+    # @param [String] file  the absolute path
+    # @return [Boolean]
+    def current_path?(file)
+      file.start_with?(Dir.pwd) && !file.match(%r(/vendor/))
     end
 
     # Is this path included in a gem?
@@ -123,6 +133,14 @@ class PryRescue
       else
         Gem.all_load_paths.any?{ |path| file.start_with?(path) }
       end
+    end
+
+    # Is this path in the ruby standard library?
+    #
+    # @param [String] file  the absolute path
+    # @return [Boolean]
+    def stdlib_path?(file)
+      file.start_with?(RbConfig::CONFIG['libdir']) || %w( (eval) <internal:prelude> ).include?(file)
     end
 
     # Remove bindings that are part of Interception/Pry.rescue's internal
