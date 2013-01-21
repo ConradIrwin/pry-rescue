@@ -1,4 +1,4 @@
-Pry::Commands.create_command "cd-cause", "Move to the previously raised exception"  do
+Pry::Commands.create_command "cd-cause", "Move to the exception that caused this exception to happen"  do
 
   banner <<-BANNER
     Usage: cd-cause
@@ -40,6 +40,36 @@ Pry::Commands.create_command "cd-cause", "Move to the previously raised exceptio
     else
       raise Pry::CommandError, "No previous exception detected"
     end
+  end
+end
+
+Pry::Commands.create_command "cd-raise", "Move to the point at which an exception was raised" do
+  banner <<-BANNER
+    Usage: cd-raise [_ex_]
+
+    Starts a new pry session at the point that the given exception was raised.
+
+    If no exception is given, defaults to _ex_, the most recent exception that
+    was raised by code you ran from within pry.
+
+    @example
+
+      [2] pry(main)> foo
+      RuntimeError: two
+      from /home/conrad/0/ruby/pry-rescue/a.rb:4:in `rescue in foo'
+      [3] pry(main)> cd-raise
+
+          1: def foo
+          2:   raise "one"
+          3: rescue => e
+       => 4:   raise "two"
+          5: end
+  BANNER
+
+  def process
+    ex = target.eval(args.first || "_ex_")
+    raise Pry::CommandError, "No most recent exception" unless ex
+    Pry.rescued(ex)
   end
 end
 

@@ -17,6 +17,38 @@ describe "pry-rescue commands" do
     end
   end
 
+  describe "cd-raise" do
+    it "should enter the context of an explicit exception" do
+      begin
+        b1 = binding
+        raise "original"
+      rescue => e1
+        b2 = binding
+      end
+
+      Pry.should_receive(:rescued).once.with{ |raised|
+        raised.should == e1
+      }
+
+      Pry.new.process_command 'cd-raise e1', '', binding
+    end
+
+    it "should enter the context of _ex_ if no exception is given" do
+      begin
+        b1 = binding
+        raise "original"
+      rescue => _ex_
+        b2 = binding
+      end
+
+      Pry.should_receive(:rescued).once.with{ |raised|
+        raised.should == _ex_
+      }
+
+      Pry.new.process_command 'cd-raise', '', binding
+    end
+  end
+
   describe "cd-cause" do
     it "should enter the next exception's context" do
       begin

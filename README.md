@@ -75,6 +75,30 @@ end
 Pry::rescue{ test }
 ```
 
+cd-raise
+========
+
+If you've run some code in Pry, and an exception was raised, you can use the `cd-raise`
+command:
+
+```
+[1] pry(main)> foo
+RuntimeError: two
+from a.rb:4:in `rescue in foo'
+[2] pry(main)> cd-raise
+From: a.rb @ line 4 Object#foo:
+
+    1: def foo
+    2:   raise "one"
+    3: rescue => e
+ => 4:   raise "two"
+    5: end
+
+[1] pry(main)>
+```
+
+To get back from `cd-raise` you can either type `<ctrl+d>` or `cd ..`.
+
 cd-cause
 ========
 

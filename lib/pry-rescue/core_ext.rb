@@ -74,7 +74,7 @@ class << Pry
   #   end
   #
   def enable_rescuing!
-    @raised = []
+    @raised ||= []
     @rescuing = true
     Interception.listen do |exception, binding|
       if defined?(PryStackExplorer)

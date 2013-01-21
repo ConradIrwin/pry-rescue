@@ -24,6 +24,11 @@ begin
 rescue LoadError
 end
 
+# Ensure that any exceptions raised within pry are available
+Pry.config.hooks.add_hook :before_session, :enable_rescuing do
+  Pry.enable_rescuing!
+end
+
 # PryRescue provides the ability to open a Pry shell whenever an unhandled exception is
 # raised in your code.
 #
