@@ -157,7 +157,7 @@ class PryRescue
       bindings.drop_while do |b|
         b.eval("__FILE__") == File.expand_path("../pry-rescue/core_ext.rb", __FILE__)
       end.drop_while do |b|
-        b.eval("self") == Interception
+        Interception == b.eval("self")
       end
     end
 
