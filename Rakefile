@@ -10,7 +10,7 @@ end
 
 desc "Run tests"
 task :test do
-  sh 'rspec spec -r ./spec/spec_helpers.rb'
+  sh 'rspec spec'
 end
 
 task :build do
