@@ -1,3 +1,6 @@
+task :default => :test
+task :spec => :test
+
 desc "Run example"
 task :example do
   sh "ruby -I./lib/ ./examples/example.rb "
