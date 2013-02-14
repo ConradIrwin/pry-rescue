@@ -30,6 +30,13 @@ include it in development!)
 use PryRescue::Rack
 ```
 
+If you're using rspec, you should add `pry-rescue` to your Gemfile and then you can
+enable rescuing on failed tests by running:
+
+```
+rescue rspec
+```
+
 If you want more fine-grained control over which parts of your code are rescued, you can
 also use the block form:
 

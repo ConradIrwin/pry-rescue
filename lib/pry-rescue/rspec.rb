@@ -1,4 +1,4 @@
-require 'pry'
+require 'pry-rescue'
 RSpec.configure do |c|
   c.around(:each) do |example|
     Pry::rescue do
