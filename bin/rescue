@@ -31,7 +31,7 @@ end
 
 case ARGV[0]
 when 'rails'
-  ENV['PRY_RESCUE'] = 'rails'
+  ENV['PRY_RESCUE_RAILS'] = 'true'
   exec(*ARGV)
 when 'rspec'
   ENV['SPEC_OPTS'] = "#{ENV['SPEC_OPTS']} -r pry-rescue/rspec"
