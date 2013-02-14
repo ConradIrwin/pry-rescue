@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name          = 'pry-rescue'
-  s.version       = '0.18'
+  s.version       = '0.18.1'
   s.summary       = 'Open a pry session on any unhandled exceptions'
   s.description   = 'Allows you to wrap code in Pry::rescue{ } to open a pry session at any unhandled exceptions'
   s.homepage      = 'https://github.com/ConradIrwin/pry-rescue'
