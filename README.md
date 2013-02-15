@@ -31,8 +31,8 @@ use PryRescue::Rack
 ```
 
 If you're using rspec (or [respec](https://github.com/oggy/respec)), you should add
-`pry-rescue` to your Gemfile and then you can enable rescuing on failed tests by
-running:
+`pry-rescue` and `pry-stack_explorer` to your Gemfile and then you can enable rescuing
+on failed tests by running:
 
 ```
 rescue rspec  # rspec
