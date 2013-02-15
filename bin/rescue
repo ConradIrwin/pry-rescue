@@ -30,7 +30,7 @@ when /\A-/
 when 'rails'
   ENV['PRY_RESCUE'] = 'rails'
   exec(*ARGV)
-when /re?spec/
+when /^re?spec$/
   ENV['SPEC_OPTS'] = "#{ENV['SPEC_OPTS']} -r pry-rescue/rspec"
   exec(*ARGV)
 end
