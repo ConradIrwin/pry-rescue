@@ -27,13 +27,10 @@ when '--'
 when /\A-/
   puts USAGE
   exit
-end
-
-case ARGV[0]
 when 'rails'
   ENV['PRY_RESCUE'] = 'rails'
   exec(*ARGV)
-when 'rspec'
+when /re?spec/
   ENV['SPEC_OPTS'] = "#{ENV['SPEC_OPTS']} -r pry-rescue/rspec"
   exec(*ARGV)
 end
