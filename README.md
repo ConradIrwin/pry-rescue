@@ -1,5 +1,6 @@
 
-**pry-rescue** super-fast, painless, debugging for the (ruby) masses. (See [Pry to the rescue!](http://cirw.in/blog/pry-to-the-rescue))
+**pry-rescue** - super-fast painless debugging for the (ruby) masses. (See [Pry to
+the rescue!](http://cirw.in/blog/pry-to-the-rescue))
 
 General usage
 =============
@@ -31,9 +32,9 @@ bundle exec rescue rails server
 ```
 
 Be sure to keep an eye at the console output now, because whenever an exception occurs,
-the page loading will be switched on hold until you interact with pry in the console
+the page loading will be set on hold until you interact with pry in the console
 (there's also a nice gem [better_errors](https://github.com/charliesome/better_errors)
-which will you interact with pry from within your browser if you like this better).
+which will let you interact with pry from within your browser if you like this better).
 
 You can also run rake like so:
 
