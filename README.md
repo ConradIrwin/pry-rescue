@@ -1,15 +1,50 @@
+**pry-rescue** - super-fast debugging for ruby. (See [Pry to the
+rescue!](http://cirw.in/blog/pry-to-the-rescue))
 
-**pry-rescue** - super-fast painless debugging for the (ruby) masses. (See [Pry to
-the rescue!](http://cirw.in/blog/pry-to-the-rescue))
+Introduction
+============
 
-General usage
-=============
+pry-rescue is an implementation of "break on unhandled exception" for Ruby. Whenever an
+exception is raised, but not rescued, pry-rescue will automatically open pry for you:
 
-Ruby scripts
-------------
+```ruby
+$ rescue examples/example2.rb
+From: /home/conrad/0/ruby/pry-rescue/examples/example2.rb @ line 19 Object#beta:
 
-First `gem install pry-rescue pry-stack_explorer`. Then run your program with `rescue`
-instead of `ruby`:
+    17: def beta
+    18:   y = 30
+ => 19:   gamma(1, 2)
+    20: end
+
+ArgumentError: wrong number of arguments (2 for 1)
+from /home/conrad/0/ruby/pry-rescue/examples/example2.rb:22:in `gamma`
+[1] pry(main)>
+```
+
+Installation
+============
+
+You can install `pry-rescue` with rubygems as normal, and I strongly recommend you also
+install `pry-stack_explorer`. See [Known bugs](#known-bugs) for places that won't work.
+
+```
+gem install pry-rescue pry-stack_explorer
+```
+
+If you're using Bundler, you can add it to your Gemfile in the development group:
+
+```ruby
+group :development do
+  gem 'pry-rescue'
+  gem 'pry-stack_explorer'
+end
+```
+
+Usage
+=====
+
+For simple ruby scripts, just run them with the `rescue` executable instead of the `ruby`
+executable.
 
 ```
 rescue <script.rb> [arguments..]
@@ -18,8 +53,7 @@ rescue <script.rb> [arguments..]
 Rails
 -----
 
-If you're using Rails, you should add `pry-rescue` to the development section of your
-Gemfile and then run rails server using rescue:
+For rails, use `rescue rails` in place of `rails`, for example:
 
 ```
 rescue rails server
@@ -31,16 +65,54 @@ If you're using `bundle exec` the rescue should go after the exec:
 bundle exec rescue rails server
 ```
 
-Be sure to keep an eye at the console output now, because whenever an exception occurs,
-the page loading will be set on hold until you interact with pry in the console
-(there's also a nice gem [better_errors](https://github.com/charliesome/better_errors)
-which will let you interact with pry from within your browser if you like this better).
+Then whenever an unhandled exception happens inside rails, a pry console will open on
+stdout. This is the same terminal that you see the rails logs on, so if you're
+using something like [pow](https://pow.cx) then you will run into difficulties.
 
-You can also run rake like so:
+You might also be interested in
+[better_errors](https://github.com/charliesome/better_errors) which opens consoles in your
+browser on unhandled exceptions, and [pry-rails](https://github.com/rweng/pry-rails) which
+adds some rails specific helpers to pry, and replaces `rails console` by pry.
 
+Rspec
+-----
+
+If you're using [RSpec](https://rspec.org) or
+[respec](https://github.com/oggy/respec), you can open a pry session on
+every test failure using `rescue rspec` or `rescue respec`:
+
+```ruby
+$ rescue rspec
+From: /home/conrad/0/ruby/pry-rescue/examples/example_spec.rb @ line 9 :
+
+     6:
+     7: describe "Float" do
+     8:   it "should be able to add" do
+ =>  9:     (0.1 + 0.2).should == 0.3
+    10:   end
+    11: end
+
+RSpec::Expectations::ExpectationNotMetError: expected: 0.3
+     got: 0.30000000000000004 (using ==)
+[1] pry(main)>
 ```
-rescue rake
+
+Unfortunately using `edit -c` to edit `_spec.rb` files does not yet reload the
+code in a way that the `try-again` command can understand. You can still use
+`try-again` if you edit code that is not in spec files.
+
+Minitest
+--------
+
+Add the following to your `test_helper.rb` or to the top of your test file.
+
+```ruby
+require 'minitest/autorun'
+require 'pry-rescue/minitest'
 ```
+
+Then, when you have a failure, you can use `edit`, `edit -c`, and `edit-method`, then
+`try-again` to re-run the tests.
 
 Rack
 ----
@@ -49,7 +121,78 @@ If you're using Rack, you should use the middleware instead (though be careful t
 include it in development!):
 
 ```
-use PryRescue::Rack
+use PryRescue::Rack if ENV["RACK_ENV"] == 'development'
+```
+
+Pry commands
+============
+
+`pry-rescue` adds two commands to pry. `cd-cause` and `try-again`. In combination with
+`edit --method` these can let you fix the problem with your code and verify that the fix
+worked without restarting your program.
+
+cd-cause
+--------
+
+If you've run some code in Pry, and an exception was raised, you can use the `cd-cause`
+command:
+
+```ruby
+[1] pry(main)> foo
+RuntimeError: two
+from a.rb:4:in `rescue in foo`
+[2] pry(main)> cd-cause
+From: a.rb @ line 4 Object#foo:
+
+    1: def foo
+    2:   raise "one"
+    3: rescue => e
+ => 4:   raise "two"
+    5: end
+
+[3] pry(main)>
+```
+
+If that exception was in turn caused by a previous exception you can use
+`cd-cause` again to move to the original problem:
+
+```ruby
+[3] pry(main)> cd-cause
+From: examples/example.rb @ line 4 Object#test:
+
+    4: def test
+ => 5:   raise "foo"
+    6: rescue => e
+    7:   raise "bar"
+    8: end
+
+RuntimeError: foo
+from examples/example.rb:5:in `test`
+[4] pry(main)>
+```
+
+To get back from `cd-cause` you can either type `<ctrl+d>` or `cd ..`.
+
+try-again
+---------
+
+Once you've used Pry's `edit` or command to fix your code, you can issue a `try-again`
+command to re-run your code. For rails and rack, this re-runs the request, for minitest
+and rspec, it re-runs the current test, for more advanced users this re-runs the
+`Pry::rescue{ }` block.
+
+```ruby
+[4] pry(main)> edit --method
+[5] pry(main)> whereami
+From: examples/example.rb @ line 4 Object#test:
+
+    4: def test
+ => 5:   puts "foo"
+    6: rescue => e
+    7:   raise "bar"
+    8: end
+[6] pry(main)> try-again
+foo
 ```
 
 Advanced usage
@@ -86,7 +229,7 @@ From: examples/example.rb @ line 4 Object#test:
     8: end
 
 RuntimeError: bar
-from examples/example.rb:7:in `rescue in test'
+from examples/example.rb:7:in `rescue in test`
 [1] pry(main)>
 ```
 
@@ -104,115 +247,8 @@ rescue => e
 end
 
 Pry::rescue{ test }
-```
-
-cd-raise
---------
-
-If you've run some code in Pry, and an exception was raised, you can use the `cd-raise`
-command:
 
 ```
-[1] pry(main)> foo
-RuntimeError: two
-from a.rb:4:in `rescue in foo'
-[2] pry(main)> cd-raise
-From: a.rb @ line 4 Object#foo:
-
-    1: def foo
-    2:   raise "one"
-    3: rescue => e
- => 4:   raise "two"
-    5: end
-
-[1] pry(main)>
-```
-
-To get back from `cd-raise` you can either type `<ctrl+d>` or `cd ..`.
-
-cd-cause
---------
-
-If you need to find the reason that the exception happened, you can use the `cd-cause`
-command:
-
-```
-[1] pry(main)> cd-cause
-From: examples/example.rb @ line 4 Object#test:
-
-    4: def test
- => 5:   raise "foo"
-    6: rescue => e
-    7:   raise "bar"
-    8: end
-
-RuntimeError: foo
-from examples/example.rb:5:in `test'
-[1] pry(main)>
-```
-
-To get back from `cd-cause` you can either type `<ctrl+d>` or `cd ..`.
-
-try-again
----------
-
-Once you've used Pry's `edit` or `edit-method` commands to fix your code, you can issue a
-`try-again` command to re-run your code. (Either from the start in the case of using the
-`rescue` script, or from the block if you're using that API).
-
-```
-[1] pry(main)> edit-method
-[2] pry(main)> whereami
-From: examples/example.rb @ line 4 Object#test:
-
-    4: def test
- => 5:   puts "foo"
-    6: rescue => e
-    7:   raise "bar"
-    8: end
-[3] pry(main)> try-again
-foo
-```
-
-Testing
-=======
-
-Pry-rescue comes with beta support for minitest and rspec: test failures will
-drop you into pry at that location.  Please feel free to try these out, and
-leave bug reports if something is not working.
-
-Note that for either of these, you will find `exit!` very handy: there is a pry
-`exit` command that will merely drop you into the next failure.
-
-Minitest
---------
-
-Add the following to your `test_helper.rb` or to the top of your test file.
-
-```ruby
-require 'minitest/autorun'
-require 'pry-rescue/minitest'
-```
-
-Then, when you have a failure, you can use `edit`, `edit -c`, and `edit-method`, then
-`try-again` to re-run the tests, or run it by name (`test_foo`).
-
-RSpec
------
-
-If you're using RSpec (or [respec](https://github.com/oggy/respec)), you should add
-`pry-rescue` and `pry-stack_explorer` to your Gemfile and then you can enable rescuing
-on failed tests by running:
-
-```
-rescue rspec  # rspec
-rescue respec # respec
-```
-
-Note that, unlike minitest, rspec creates odd structures instead of classes, so
-it is somewhat resistant to live-coding practices. In particular,  `edit -c` to
-edit the test then `try-again` doesn't work (so you'll have to `exit!`).
-
 Peeking
 =======
 
@@ -223,7 +259,7 @@ suprisingly long time to run.
 In this case it's useful to be able to open a pry console when you notice that your
 program is not going anywhere. To do this, send your process a `SIGQUIT` using `<ctrl+\>`.
 
-```
+```ruby
 cirwin@localhost:/tmp/pry $ ruby examples/loop.rb
 ^\
 Preparing to peek via pry!
@@ -242,7 +278,8 @@ pry (main)>
 Advanced peeking
 ----------------
 
-You can configure which signal pry-rescue listens for by default by exporting the PRY_PEEK
+You can configure which signal pry-rescue listens for by default by exporting the
+`PRY_PEEK`
 environment variable that suits your use-case best:
 
 ```
