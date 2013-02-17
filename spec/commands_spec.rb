@@ -1,3 +1,5 @@
+require './spec/spec_helper'
+
 describe "pry-rescue commands" do
   describe "try-again" do
     it "should throw try_again" do
