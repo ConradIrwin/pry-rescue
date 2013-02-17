@@ -39,21 +39,19 @@ Pry::Commands.create_command "cd-cause", "Move to the exception that caused this
   BANNER
 
   def process
-    if args.any?
-      Pry.rescued target.eval(args.first)
-    else
-      # TODO: better understand why !defined?(_ex_)
-      ex = target.eval("defined?(_ex_) && _ex_")
-      raised = target.eval("_raised_.dup rescue nil")
+    return Pry.rescued target.eval(args.first) if args.any?
 
-      if raised && raised.last.first == ex
-        raised.pop
-        PryRescue.enter_exception_context(raised)
-      elsif ex
-        Pry.rescued(ex)
-      else
-        raise Pry::CommandError, "No previous exception detected"
-      end
+    # TODO: better understand why !defined?(_ex_)
+    ex = target.eval("defined?(_ex_) && _ex_")
+    raised = target.eval("_raised_.dup rescue nil")
+
+    if raised && raised.last.first == ex
+      raised.pop
+      PryRescue.enter_exception_context(raised)
+    elsif ex
+      Pry.rescued(ex)
+    else
+      raise Pry::CommandError, "No previous exception detected"
     end
   end
 end
