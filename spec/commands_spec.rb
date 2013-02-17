@@ -79,7 +79,9 @@ describe "pry-rescue commands" do
         b1 = binding
         raise "original"
       rescue => e1
+        # Hacks due to us not really entering a pry session here
         _raised_ = [[e1, [b1]]]
+        _ex_ = e1
       end
 
       lambda{
