@@ -1,8 +1,12 @@
 
-**pry-rescue** super-fast, painless, debugging for the (ruby) masses. (See [Pry to the rescue!](http://cirw.in/blog/pry-to-the-rescue))
+**pry-rescue** - super-fast painless debugging for the (ruby) masses. (See [Pry to
+the rescue!](http://cirw.in/blog/pry-to-the-rescue))
 
-Usage
-=====
+General usage
+=============
+
+Ruby scripts
+------------
 
 First `gem install pry-rescue pry-stack_explorer`. Then run your program with `rescue`
 instead of `ruby`:
@@ -11,8 +15,11 @@ instead of `ruby`:
 rescue <script.rb> [arguments..]
 ```
 
+Rails
+-----
+
 If you're using Rails, you should add `pry-rescue` to the development section of your
-Gemspec and then run rails server using rescue:
+Gemfile and then run rails server using rescue:
 
 ```
 rescue rails server
@@ -24,18 +31,32 @@ If you're using `bundle exec` the rescue should go after the exec:
 bundle exec rescue rails server
 ```
 
+Be sure to keep an eye at the console output now, because whenever an exception occurs,
+the page loading will be set on hold until you interact with pry in the console
+(there's also a nice gem [better_errors](https://github.com/charliesome/better_errors)
+which will let you interact with pry from within your browser if you like this better).
+
+You can also run rake like so:
+
+```
+rescue rake
+```
+
+Rack
+----
+
 If you're using Rack, you should use the middleware instead (though be careful to only
-include it in development!)
+include it in development!):
+
 ```
 use PryRescue::Rack
 ```
 
-If you're using rspec, you should add `pry-rescue` to your Gemfile and then you can
-enable rescuing on failed tests by running:
+Advanced usage
+==============
 
-```
-rescue rspec
-```
+Block form
+----------
 
 If you want more fine-grained control over which parts of your code are rescued, you can
 also use the block form:
@@ -69,6 +90,9 @@ from examples/example.rb:7:in `rescue in test'
 [1] pry(main)>
 ```
 
+Rescuing an exception
+---------------------
+
 Finally. If you're doing your own exception handling, you can ask pry to open on an exception that you've caught.
 For this to work you must be inside a Pry::rescue{ } block.
 
@@ -83,7 +107,7 @@ Pry::rescue{ test }
 ```
 
 cd-raise
-========
+--------
 
 If you've run some code in Pry, and an exception was raised, you can use the `cd-raise`
 command:
@@ -107,7 +131,7 @@ From: a.rb @ line 4 Object#foo:
 To get back from `cd-raise` you can either type `<ctrl+d>` or `cd ..`.
 
 cd-cause
-========
+--------
 
 If you need to find the reason that the exception happened, you can use the `cd-cause`
 command:
@@ -130,7 +154,7 @@ from examples/example.rb:5:in `test'
 To get back from `cd-cause` you can either type `<ctrl+d>` or `cd ..`.
 
 try-again
-=========
+---------
 
 Once you've used Pry's `edit` or `edit-method` commands to fix your code, you can issue a
 `try-again` command to re-run your code. (Either from the start in the case of using the
@@ -160,7 +184,8 @@ leave bug reports if something is not working.
 Note that for either of these, you will find `exit!` very handy: there is a pry
 `exit` command that will merely drop you into the next failure.
 
-### minitest
+Minitest
+--------
 
 Add the following to your `test_helper.rb` or to the top of your test file.
 
@@ -172,18 +197,21 @@ require 'pry-rescue/minitest'
 Then, when you have a failure, you can use `edit`, `edit -c`, and `edit-method`, then
 `try-again` to re-run the tests, or run it by name (`test_foo`).
 
-### rspec
+RSpec
+-----
 
-Add the following to your `spec_helper.rb` or to the top of your test file.
+If you're using RSpec (or [respec](https://github.com/oggy/respec)), you should add
+`pry-rescue` and `pry-stack_explorer` to your Gemfile and then you can enable rescuing
+on failed tests by running:
 
-```ruby
-require 'pry-rescue/rspec'
+```
+rescue rspec  # rspec
+rescue respec # respec
 ```
 
 Note that, unlike minitest, rspec creates odd structures instead of classes, so
 it is somewhat resistant to live-coding practices. In particular,  `edit -c` to
 edit the test then `try-again` doesn't work (so you'll have to `exit!`).
-
 
 Peeking
 =======
@@ -212,7 +240,7 @@ pry (main)>
 ```
 
 Advanced peeking
-================
+----------------
 
 You can configure which signal pry-rescue listens for by default by exporting the PRY_PEEK
 environment variable that suits your use-case best:
@@ -253,14 +281,6 @@ you trigger the signal.
 ```
 export RUBYOPT=-r/home/cirwin/src/pry-rescue/lib/pry-rescue/peek/usr2
 ```
-
-pry-stack explorer
-==================
-
-If you're running rubinius, or ruby-1.9, then you can use `pry-rescue` alongside
-`pry-stack\_explorer`. This gives you the ability to move `up` or `down` the stack so that
-you can get a better idea of why your function ended up in a bad state. Run
-[example2.rb](https://github.com/ConradIrwin/pry-rescue/blob/master/examples/example2.rb) to get a feel for what this is like.
 
 Known bugs
 ==========
