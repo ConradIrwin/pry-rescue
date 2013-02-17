@@ -1,75 +1,60 @@
 Pry::Commands.create_command "cd-cause", "Move to the exception that caused this exception to happen"  do
 
   banner <<-BANNER
-    Usage: cd-cause
+    Usage: cd-cause [_ex_]
 
-    Starts a new pry session at the previously raised exception.
+    Starts a new Pry session at the previously raised exception.
 
-    This is useful if you've caught one exception, and raised another,
-    if you need to find out why the original was raised.
+    If you have many layers of exceptions that are rescued and then re-raised,
+    you can repeat cd-cause as many times as you need.
 
-    @example
-      5.    def foo
-      6.      raise "one"
-      7.    rescue
-      8. =>   raise "two"
-      9.    end
-
-      pry> cd-cause
-
-      5.    def foo
-      6. =>   raise "one"
-      7.    rescue
-      8.      raise "two"
-      9.    end
-
-    Once you have finished with the internal exception type <ctrl+d> or cd .. to
-    return to where you were.
-
-    If you have many layers of exceptions that are rescued and then re-raised, you
-    can repeat cd-cause as many times as you need.
-  BANNER
-
-  def process
-    raised = target.eval("_raised_.dup rescue nil")
-    raise Pry::CommandError, "cd-cause only works in a pry session created by Pry::rescue{}" unless raised
-    raised.pop
-
-    if raised.any?
-      PryRescue.enter_exception_context(raised)
-    else
-      raise Pry::CommandError, "No previous exception detected"
-    end
-  end
-end
-
-Pry::Commands.create_command "cd-raise", "Move to the point at which an exception was raised" do
-  banner <<-BANNER
-    Usage: cd-raise [_ex_]
-
-    Starts a new pry session at the point that the given exception was raised.
-
-    If no exception is given, defaults to _ex_, the most recent exception that
-    was raised by code you ran from within pry.
+    The cd-cause command is useful if:
+      - You've just caused an exception within Pry, and you want to see why
+      - When an intermediate exception handler
+        - Intentionally re-raises an exception
+        - Has a bug that causes an inadvertent exception
 
     @example
-
       [2] pry(main)> foo
       RuntimeError: two
       from /home/conrad/0/ruby/pry-rescue/a.rb:4:in `rescue in foo'
-      [3] pry(main)> cd-raise
+      [3] pry(main)> cd-cause
 
           1: def foo
           2:   raise "one"
           3: rescue => e
        => 4:   raise "two"
           5: end
+
+      [4] pry(main)> cd-cause
+
+          1: def foo
+       => 2:   raise "one"
+          3: rescue => e
+          4:   raise "two"
+          5: end
+
+    Once you have finished inspecting the exception, type <ctrl+d> or cd .. to
+    return to where you were.
   BANNER
 
   def process
-    ex = target.eval(args.first || "_ex_")
-    raise Pry::CommandError, "No most recent exception" unless ex
-    Pry.rescued(ex)
+    if args.any?
+      Pry.rescued target.eval(args.first)
+    else
+      # TODO: better understand why !defined?(_ex_)
+      ex = target.eval("defined?(_ex_) && _ex_")
+      raised = target.eval("_raised_.dup rescue nil")
+
+      if raised && raised.last.first == ex
+        raised.pop
+        PryRescue.enter_exception_context(raised)
+      elsif ex
+        Pry.rescued(ex)
+      else
+        raise Pry::CommandError, "No previous exception detected"
+      end
+    end
   end
 end
 

@@ -19,7 +19,7 @@ describe "pry-rescue commands" do
     end
   end
 
-  describe "cd-raise" do
+  describe "cd-cause" do
     it "should enter the context of an explicit exception" do
       begin
         b1 = binding
@@ -32,7 +32,7 @@ describe "pry-rescue commands" do
         raised.should == e1
       }
 
-      Pry.new.process_command 'cd-raise e1', '', binding
+      Pry.new.process_command 'cd-cause e1', '', binding
     end
 
     it "should enter the context of _ex_ if no exception is given" do
@@ -47,7 +47,7 @@ describe "pry-rescue commands" do
         raised.should == _ex_
       }
 
-      Pry.new.process_command 'cd-raise', '', binding
+      Pry.new.process_command 'cd-cause', '', binding
     end
   end
 
@@ -59,10 +59,12 @@ describe "pry-rescue commands" do
           raise "original"
         rescue => e1
           b2 = binding
-          raise
+          raise # similar to dubious re-raises you'll find in the wild
         end
       rescue => e2
+        # Hacks due to us not really entering a pry session here
         _raised_ = [[e1, [b1]], [e2, [b2]]]
+        _ex_ = e2
       end
 
       PryRescue.should_receive(:enter_exception_context).once.with{ |raised|
@@ -88,7 +90,7 @@ describe "pry-rescue commands" do
     it "should raise a CommandError if not in Pry::rescue" do
       lambda{
         Pry.new.process_command 'cd-cause', '', binding
-      }.should raise_error Pry::CommandError, /Pry::rescue/
+      }.should raise_error Pry::CommandError, /No previous exception/
     end
   end
 end
