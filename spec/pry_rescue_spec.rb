@@ -95,6 +95,13 @@ describe "PryRescue.load" do
         PryRescue.load("spec/fixtures/raiseother.rb")
       }.should raise_error(/raiseother_exception/)
     end
+
+    it "should work if bindings is nil" do
+      PryRescue.stub(:without_bindings_below_raise).and_return nil
+      PryRescue.stub(:phantom_load_raise?).and_return false
+      PryRescue.stub(:with_program_name).and_return nil
+      PryRescue.enter_exception_context [:hi]
+    end
   else
     it "should open at the correct point" do
       Pry.should_receive(:start).once{ |binding, h|

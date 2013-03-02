@@ -166,6 +166,7 @@ class PryRescue
     # @param [Array<Bindings>] bindings  The call stack
     # @return [Array<Bindings>]
     def without_duplicates(bindings)
+      bindings = Array(bindings)
       bindings.zip([nil] + bindings).reject do |b, c|
         # The eval('__method__') is there as a shortcut as loading a method
         # from a binding is very slow.
