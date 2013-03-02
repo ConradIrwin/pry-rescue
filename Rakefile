@@ -11,6 +11,12 @@ task :example2 do
   sh "ruby -I./lib/ ./examples/example2.rb "
 end
 
+desc 'Run syntax-err example'
+task :sintax do
+  ENV['RUBYLIB'] = 'lib'
+  sh 'bin/rescue examples/syntax-err.rb'
+end
+
 desc "Run tests"
 task :test do
   sh 'rspec spec'
