@@ -6,6 +6,10 @@ require File.expand_path('../pry-rescue/core_ext', __FILE__)
 require File.expand_path('../pry-rescue/commands', __FILE__)
 require File.expand_path('../pry-rescue/rack', __FILE__)
 require File.expand_path('../pry-rescue/peek.rb', __FILE__)
+require File.expand_path('../pry-rescue/autofix.rb', __FILE__)
+Dir[File.expand_path('../pry-rescue/autofix/*', __FILE__)].each do |f|
+  require f
+end
 
 if ENV['PRY_RESCUE_RAILS']
   require File.expand_path('../pry-rescue/rails', __FILE__)
@@ -50,11 +54,12 @@ class PryRescue
 
       bindings = without_bindings_below_raise(bindings)
       bindings = without_duplicates(bindings)
+      fixers = PryRescue::Autofix.for(exception, bindings)
 
       with_program_name "#$PROGRAM_NAME [in pry-rescue @ #{Dir.pwd}]" do
         if defined?(PryStackExplorer)
           pry :call_stack => bindings,
-              :hooks => pry_hooks(exception),
+              :hooks => pry_hooks(exception, fixers),
               :initial_frame => initial_frame(bindings)
         else
           Pry.start bindings.first, :hooks => pry_hooks(exception)
@@ -179,13 +184,28 @@ class PryRescue
     #
     # @param [Exception] ex  The exception we're currently looking at
     # @param [Array<Exception, Array<Binding>>] raised  The exceptions raised
-    def pry_hooks(ex)
+    def pry_hooks(ex, fixers)
       hooks = Pry.config.hooks.dup
       hooks.add_hook(:before_session, :save_captured_exception) do |_, _, _pry_|
         _pry_.last_exception = ex
         _pry_.backtrace = ex.backtrace
         _pry_.sticky_locals.merge!(:_rescued_ => ex)
         _pry_.exception_handler.call(_pry_.output, ex, _pry_)
+      end
+
+      hooks.add_hook(:before_session, :autofixers) do |_, _, _pry_|
+        case fixers.size
+        when 0
+          next
+        when 1
+          puts "Would you like to #{fixers.first.suggestion}? (type yes to activate)"
+          _pry_.commands.command "yes", fixers.first.suggestion do
+            fixers.first.fix!
+            run "try-again"
+          end
+        else
+          puts "There are several ways to fix this..."
+        end
       end
 
       hooks
