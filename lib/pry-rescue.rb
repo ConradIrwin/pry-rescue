@@ -41,25 +41,23 @@ class PryRescue
 
     # Start a Pry session in the context of the exception.
     # @param [Array<Exception, Array<Binding>>] raised  The exceptions raised
-    def enter_exception_context(raised)
+    def enter_exception_context(exception)
       @exception_context_depth ||= 0
       @exception_context_depth += 1
 
-      raised = raised.map do |e, bs|
-        [e, without_bindings_below_raise(bs)]
-      end
+      exception = exception.instance_variable_get(:@rescue_cause) if phantom_load_raise?(exception)
+      bindings = exception.instance_variable_get(:@rescue_bindings)
 
-      raised.pop if phantom_load_raise?(*raised.last)
-      exception, bindings = raised.last
+      bindings = without_bindings_below_raise(bindings)
       bindings = without_duplicates(bindings)
 
       with_program_name "#$PROGRAM_NAME [in pry-rescue @ #{Dir.pwd}]" do
         if defined?(PryStackExplorer)
           pry :call_stack => bindings,
-              :hooks => pry_hooks(exception, raised),
+              :hooks => pry_hooks(exception),
               :initial_frame => initial_frame(bindings)
         else
-          Pry.start bindings.first, :hooks => pry_hooks(exception, raised)
+          Pry.start bindings.first, :hooks => pry_hooks(exception)
         end
       end
     ensure
@@ -87,7 +85,8 @@ class PryRescue
     #
     # @param [Exception] e  The raised exception
     # @param [Array<Binding>] bindings  The call stack
-    def phantom_load_raise?(e, bindings)
+    def phantom_load_raise?(e)
+      bindings = e.instance_variable_get(:@rescue_bindings)
       bindings.any? && bindings.first.eval("__FILE__") == __FILE__
     end
 
@@ -180,12 +179,12 @@ class PryRescue
     #
     # @param [Exception] ex  The exception we're currently looking at
     # @param [Array<Exception, Array<Binding>>] raised  The exceptions raised
-    def pry_hooks(ex, raised)
+    def pry_hooks(ex)
       hooks = Pry.config.hooks.dup
       hooks.add_hook(:before_session, :save_captured_exception) do |_, _, _pry_|
         _pry_.last_exception = ex
         _pry_.backtrace = ex.backtrace
-        _pry_.sticky_locals.merge!({ :_raised_ => raised })
+        _pry_.sticky_locals.merge!(:_rescued_ => ex)
         _pry_.exception_handler.call(_pry_.output, ex, _pry_)
       end
 

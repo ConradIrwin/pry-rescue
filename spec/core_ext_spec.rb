@@ -33,34 +33,6 @@ describe 'Pry.rescue' do
     @inner.should == 2
   end
 
-  it "should clear out exceptions between retrys at the same level" do
-    @outer = @inner = 0
-    PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 1; throw :try_again }
-    PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 1; throw :try_again }
-    Pry::rescue do
-      @outer += 1
-      Pry::rescue do
-        @inner += 1
-        raise "oops" if @inner <= 2
-      end
-    end
-  end
-
-  it "should clear out exceptions between retrys at a higher level" do
-    @outer = @inner = 0
-    PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 1; throw :try_again }
-    PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 1; throw :try_again }
-    PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 1; throw :try_again }
-    Pry::rescue do
-      @outer += 1
-      Pry::rescue do
-        @inner += 1
-        raise "oops" if @inner <= 2
-      end
-      raise "foops" if @outer == 1
-    end
-  end
-
   it "should enter the first occurence of an exception that is re-raised" do
     PryRescue.should_receive(:enter_exception_context).once{ |raised| raised.size.should == 1 }
     lambda do
@@ -71,7 +43,7 @@ describe 'Pry.rescue' do
           raise
         end
       end
-    end.should  raise_error /first_occurance/
+    end.should raise_error(/first_occurance/)
   end
 
   it "should not catch SystemExit" do

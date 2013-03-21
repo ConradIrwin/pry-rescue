@@ -36,40 +36,44 @@ describe "pry-rescue commands" do
     end
 
     it "should enter the context of _ex_ if no exception is given" do
-      begin
-        b1 = binding
-        raise "original"
-      rescue => _ex_
-        b2 = binding
+      b2 = nil
+      _ex_ = nil
+      Pry::rescue do
+        begin
+          b1 = binding
+          raise "original"
+        rescue => _ex_
+          b2 = binding
+        end
       end
 
       Pry.should_receive(:rescued).once.with{ |raised|
         raised.should == _ex_
       }
 
-      Pry.new.process_command 'cd-cause', '', binding
+      Pry.new.process_command 'cd-cause', '', b2
     end
   end
 
   describe "cd-cause" do
     it "should enter the next exception's context" do
-      begin
+      _ex_ = nil
+      e1 = nil
+      Pry::rescue do
         begin
-          b1 = binding
-          raise "original"
-        rescue => e1
-          b2 = binding
-          raise # similar to dubious re-raises you'll find in the wild
+          begin
+            b1 = binding
+            raise "original"
+          rescue => e1
+            b2 = binding
+            raise # similar to dubious re-raises you'll find in the wild
+          end
+        rescue => e2
+          _ex_ = e2
         end
-      rescue => e2
-        # Hacks due to us not really entering a pry session here
-        _raised_ = [[e1, [b1]], [e2, [b2]]]
-        _ex_ = e2
       end
 
-      PryRescue.should_receive(:enter_exception_context).once.with{ |raised|
-        raised.should == [[e1, [b1]]]
-      }
+      PryRescue.should_receive(:enter_exception_context).once.with(e1)
 
       Pry.new.process_command 'cd-cause', '', binding
     end
@@ -80,7 +84,7 @@ describe "pry-rescue commands" do
         raise "original"
       rescue => e1
         # Hacks due to us not really entering a pry session here
-        _raised_ = [[e1, [b1]]]
+        _rescued_ = e1
         _ex_ = e1
       end
 

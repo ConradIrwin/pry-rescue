@@ -11,7 +11,6 @@ class << Pry
   def rescue(&block)
     loop do
       catch(:try_again) do
-        @raised = []
         begin
           return with_rescuing(&block)
         rescue Exception => e
@@ -34,8 +33,8 @@ class << Pry
   #   end
   #
   def rescued(e=$!)
-    if i = (@raised || []).index{ |(ee, _)| ee == e }
-      PryRescue.enter_exception_context(@raised[0..i])
+    if e.instance_variable_get(:@rescue_bindings)
+      PryRescue.enter_exception_context(e)
     else
       stack = ''
       stack = "\n" + e.backtrace.join("\n") if e.backtrace
@@ -58,8 +57,6 @@ class << Pry
       end
     end
 
-  ensure
-    @raised = []
   end
 
   # Allow Pry::rescued(e) to work at any point in your program.
@@ -73,14 +70,12 @@ class << Pry
   #     Pry::rescued(e)
   #   end
   #
-  def enable_rescuing!
-    @raised ||= []
-    @rescuing = true
-    Interception.listen do |exception, binding|
-      if defined?(PryStackExplorer)
-        @raised << [exception, binding.callers]
-      else
-        @raised << [exception, Array(binding)]
+  def enable_rescuing!(block=nil)
+    Interception.listen(block) do |exception, binding|
+      bindings = binding.respond_to?(:callers) ? binding.callers : [binding]
+      unless exception.instance_variable_get(:@rescue_bindings)
+        exception.instance_variable_set(:@rescue_bindings, bindings)
+        exception.instance_variable_set(:@rescue_cause, $!)
       end
     end
   end
@@ -96,13 +91,7 @@ class << Pry
     else
       begin
         @rescuing = true
-        Interception.listen(block) do |exception, binding|
-          if defined?(PryStackExplorer)
-            @raised << [exception, binding.callers]
-          else
-            @raised << [exception, Array(binding)]
-          end
-        end
+        enable_rescuing!(block)
       ensure
         @rescuing = false
       end
