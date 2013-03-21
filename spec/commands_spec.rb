@@ -93,6 +93,25 @@ describe "pry-rescue commands" do
       }.should raise_error Pry::CommandError, /No previous exception/
     end
 
+    it "should raise a CommandError on a re-raise" do
+      _ex_ = nil
+      Pry::rescue do
+        begin
+          begin
+            raise "oops"
+          rescue => e
+            raise e
+          end
+        rescue => _ex_
+        end
+      end
+      _rescued_ = _ex_
+
+      lambda{
+        Pry.new.process_command 'cd-cause', '', binding
+      }.should raise_error Pry::CommandError, /No previous exception/
+    end
+
     it "should raise a CommandError if not in Pry::rescue" do
       lambda{
         Pry.new.process_command 'cd-cause', '', binding

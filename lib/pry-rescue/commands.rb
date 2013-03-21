@@ -45,7 +45,7 @@ Pry::Commands.create_command "cd-cause", "Move to the exception that caused this
     rescued = target.eval("defined?(_rescued_) && _rescued_")
 
     ex = ex.instance_variable_get(:@rescue_cause) if rescued == ex
-    raise Pry::CommandError, "No previous exception to cd-cause into" unless ex
+    raise Pry::CommandError, "No previous exception to cd-cause into" if ex.nil? || ex == rescued
 
     Pry.rescued ex
   end
