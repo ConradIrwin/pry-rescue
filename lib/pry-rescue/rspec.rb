@@ -1,12 +1,58 @@
 require 'pry-rescue'
-RSpec.configure do |c|
-  c.around(:each) do |example|
-    Pry::rescue do
-      example.binding.eval('@exception = nil')
-      example.run
-      if e = example.binding.eval('@exception')
-        Pry::rescued(e)
+class PryRescue
+  class RSpec
+
+    # Run an Rspec example within Pry::rescue{ }.
+    #
+    # Takes care to ensure that `try-again` will work.
+    def self.run(example)
+      Pry::rescue do
+        begin
+          before
+
+          example.binding.eval('@exception = nil')
+          example.run
+          if e = example.binding.eval('@exception')
+            Pry::rescued(e)
+          end
+
+        ensure
+          after
+        end
       end
     end
+
+    def self.before
+      monkeypatch_capybara if defined?(Capybara)
+    end
+
+    def self.after
+      after_filters.each(&:call)
+    end
+
+    # Shunt Capybara's after filter from before Pry::rescued to after.
+    #
+    # The after filter navigates to 'about:blank', but people debugging
+    # tests probably want to see the page that failed.
+    def self.monkeypatch_capybara
+      unless Capybara.respond_to?(:reset_sessions_after_rescue!)
+        class << Capybara
+          alias_method :reset_sessions_after_rescue!, :reset_sessions!
+          def reset_sessions!; end
+        end
+
+        after_filters << Capybara.method(:reset_sessions_after_rescue!)
+      end
+    end
+
+    def self.after_filters
+      @after_filters ||= []
+    end
+  end
+end
+
+RSpec.configure do |c|
+  c.around(:each) do |example|
+    PryRescue::RSpec.run example
   end
 end
