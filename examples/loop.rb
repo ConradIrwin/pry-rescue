@@ -5,7 +5,9 @@ require 'pry-rescue'
 #
 # rescue --peek example/loop.rb
 #
-# Then hit <ctrl-c>, and be able to see what's going on.
+# Then hit <ctrl-/>, and be able to see what's going on.
+#
+puts "Hit <ctrl-/> to peek with Pry, or <ctrl+c> to quit."
 
 def r
   some_var = 13
