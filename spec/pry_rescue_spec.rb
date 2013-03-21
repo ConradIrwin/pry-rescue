@@ -96,11 +96,10 @@ describe "PryRescue.load" do
       }.should raise_error(/raiseother_exception/)
     end
 
-    it "should work if bindings is nil" do
-      PryRescue.stub(:without_bindings_below_raise).and_return nil
-      PryRescue.stub(:phantom_load_raise?).and_return false
-      PryRescue.stub(:with_program_name).and_return nil
-      PryRescue.enter_exception_context [:hi]
+    it "should output a warning if the exception was not raised" do
+      PryRescue.should_not_receive(:enter_exception_context)
+      Pry.should_receive(:warn).once
+      Pry.rescued(RuntimeError.new("foo"))
     end
   else
     it "should open at the correct point" do
