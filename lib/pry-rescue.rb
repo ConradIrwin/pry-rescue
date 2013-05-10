@@ -40,7 +40,7 @@ class PryRescue
   class << self
 
     # Start a Pry session in the context of the exception.
-    # @param [Array<Exception, Array<Binding>>] raised  The exceptions raised
+    # @param [Exception] exception  The exception raised
     def enter_exception_context(exception)
       @exception_context_depth ||= 0
       @exception_context_depth += 1
@@ -84,7 +84,6 @@ class PryRescue
     # TODO: we should figure out why it happens...
     #
     # @param [Exception] e  The raised exception
-    # @param [Array<Binding>] bindings  The call stack
     def phantom_load_raise?(e)
       bindings = e.instance_variable_get(:@rescue_bindings)
       bindings.any? && bindings.first.eval("__FILE__") == __FILE__
@@ -178,7 +177,6 @@ class PryRescue
     # properly set.
     #
     # @param [Exception] ex  The exception we're currently looking at
-    # @param [Array<Exception, Array<Binding>>] raised  The exceptions raised
     def pry_hooks(ex)
       hooks = Pry.config.hooks.dup
       hooks.add_hook(:before_session, :save_captured_exception) do |_, _, _pry_|

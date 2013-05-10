@@ -84,7 +84,7 @@ class << Pry
 
   # Ensure that Interception is active while running this block
   #
-  # @param [Proc] &block  the block
+  # @param [Proc] block  the block
   def with_rescuing(&block)
     if @rescuing
       block.call

@@ -14,7 +14,7 @@ class MiniTest::Unit::TestCase
   end
 end
 
-class << MiniTest::Unit.runner
+class << MiniTest::Unit.runner; self; end.class_eval do
   alias_method :puke_without_rescue, :puke
 
   def puke(suite, test, e)
