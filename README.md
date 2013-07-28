@@ -1,8 +1,8 @@
-**pry-rescue** - super-fast debugging for ruby. (See [Pry to the
-rescue!](http://cirw.in/blog/pry-to-the-rescue))
+# pry-rescue
 
-Introduction
-============
+Super-fast debugging for Ruby. (See [Pry to the rescue!](http://cirw.in/blog/pry-to-the-rescue))
+
+## Introduction
 
 pry-rescue is an implementation of "break on unhandled exception" for Ruby. Whenever an
 exception is raised, but not rescued, pry-rescue will automatically open pry for you:
@@ -21,8 +21,7 @@ from /home/conrad/0/ruby/pry-rescue/examples/example2.rb:22:in `gamma`
 [1] pry(main)>
 ```
 
-Installation
-============
+## Installation
 
 You can install `pry-rescue` with rubygems as normal, and I strongly recommend you also
 install `pry-stack_explorer`. See [Known bugs](#known-bugs) for places that won't work.
@@ -40,8 +39,7 @@ group :development do
 end
 ```
 
-Usage
-=====
+## Usage
 
 For simple ruby scripts, just run them with the `rescue` executable instead of the `ruby`
 executable.
@@ -50,8 +48,7 @@ executable.
 rescue <script.rb> [arguments..]
 ```
 
-Rails
------
+### Rails
 
 For rails, use `rescue rails` in place of `rails`, for example:
 
@@ -74,8 +71,7 @@ You might also be interested in
 browser on unhandled exceptions, and [pry-rails](https://github.com/rweng/pry-rails) which
 adds some rails specific helpers to pry, and replaces `rails console` by pry.
 
-Rspec
------
+### Rspec
 
 If you're using [RSpec](https://rspec.org) or
 [respec](https://github.com/oggy/respec), you can open a pry session on
@@ -101,8 +97,7 @@ Unfortunately using `edit -c` to edit `_spec.rb` files does not yet reload the
 code in a way that the `try-again` command can understand. You can still use
 `try-again` if you edit code that is not in spec files.
 
-Minitest
---------
+### Minitest
 
 Add the following to your `test_helper.rb` or to the top of your test file.
 
@@ -114,8 +109,7 @@ require 'pry-rescue/minitest'
 Then, when you have a failure, you can use `edit`, `edit -c`, and `edit-method`, then
 `try-again` to re-run the tests.
 
-Rack
-----
+### Rack
 
 If you're using Rack, you should use the middleware instead (though be careful to only
 include it in development!):
@@ -124,15 +118,13 @@ include it in development!):
 use PryRescue::Rack if ENV["RACK_ENV"] == 'development'
 ```
 
-Pry commands
-============
+## Pry commands
 
 `pry-rescue` adds two commands to pry. `cd-cause` and `try-again`. In combination with
 `edit --method` these can let you fix the problem with your code and verify that the fix
 worked without restarting your program.
 
-cd-cause
---------
+### cd-cause
 
 If you've run some code in Pry, and an exception was raised, you can use the `cd-cause`
 command:
@@ -173,8 +165,7 @@ from examples/example.rb:5:in `test`
 
 To get back from `cd-cause` you can either type `<ctrl+d>` or `cd ..`.
 
-try-again
----------
+### try-again
 
 Once you've used Pry's `edit` or command to fix your code, you can issue a `try-again`
 command to re-run your code. For rails and rack, this re-runs the request, for minitest
@@ -195,11 +186,9 @@ From: examples/example.rb @ line 4 Object#test:
 foo
 ```
 
-Advanced usage
-==============
+## Advanced usage
 
-Block form
-----------
+### Block form
 
 If you want more fine-grained control over which parts of your code are rescued, you can
 also use the block form:
@@ -233,8 +222,7 @@ from examples/example.rb:7:in `rescue in test`
 [1] pry(main)>
 ```
 
-Rescuing an exception
----------------------
+### Rescuing an exception
 
 Finally. If you're doing your own exception handling, you can ask pry to open on an exception that you've caught.
 For this to work you must be inside a Pry::rescue{ } block.
@@ -249,8 +237,8 @@ end
 Pry::rescue{ test }
 
 ```
-Peeking
-=======
+
+## Peeking
 
 Sometimes bugs in your program don't cause exceptions. Instead your program just gets
 stuck. Examples include infinite loops, slow network calls, or tests that take a
@@ -275,8 +263,7 @@ From: ./examples/loop.rb @ line 10 Object#r
 pry (main)>
 ```
 
-Advanced peeking
-----------------
+### Advanced peeking
 
 You can configure which signal pry-rescue listens for by default by exporting the
 `PRY_PEEK`
@@ -319,8 +306,7 @@ you trigger the signal.
 export RUBYOPT=-r/home/cirwin/src/pry-rescue/lib/pry-rescue/peek/usr2
 ```
 
-Known bugs
-==========
+## Known bugs
 
 * ruby 2.0, 1.9.3, 1.9.2 – no known bugs
 * ruby 1.9.1 — not supported
@@ -330,8 +316,7 @@ Known bugs
 * jruby 1.6 (1.8 mode and 1.9 mode) — incorrect value for self in NoMethodErrors
 * rbx (1.8 mode and 1.9 mode) – does not catch some low-level errors (e.g. ZeroDivisionError)
 
-Meta-fu
-=======
+## Meta-fu
 
 Released under the MIT license, see LICENSE.MIT for details. Contributions and bug-reports
 are welcome.
