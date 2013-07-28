@@ -225,7 +225,7 @@ from examples/example.rb:7:in `rescue in test`
 ### Rescuing an exception
 
 Finally. If you're doing your own exception handling, you can ask Pry to open on an exception that you've caught.
-For this to work you must be inside a Pry::rescue{ } block.
+For this to work you must be inside a `Pry::rescue{ }` block.
 
 ```ruby
 def test
@@ -242,7 +242,7 @@ Pry::rescue{ test }
 
 Sometimes bugs in your program don't cause exceptions. Instead your program just gets
 stuck. Examples include infinite loops, slow network calls, or tests that take a
-suprisingly long time to run.
+surprisingly long time to run.
 
 In this case it's useful to be able to open a Pry console when you notice that your
 program is not going anywhere. To do this, send your process a `SIGQUIT` using `<ctrl+\>`.
@@ -266,8 +266,7 @@ pry (main)>
 ### Advanced peeking
 
 You can configure which signal pry-rescue listens for by default by exporting the
-`PRY_PEEK`
-environment variable that suits your use-case best:
+`PRY_PEEK` environment variable that suits your use-case best:
 
 ```
 export PRY_PEEK=""    # don't autopeek at all
@@ -279,7 +278,7 @@ export PRY_PEEK=EXIT  # peek on program exit
 ```
 
 If it's only important for one program, then you can also set the environment variable in
-Ruby before requiring pry-rescue
+Ruby before requiring pry-rescue:
 
 ```ruby
 ENV['PRY_PEEK'] = '' # disable SIGQUIT handler
