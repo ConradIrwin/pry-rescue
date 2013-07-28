@@ -1,6 +1,8 @@
 **pry-rescue** - super-fast debugging for ruby. (See [Pry to the
 rescue!](http://cirw.in/blog/pry-to-the-rescue))
 
+[![Build Status](https://secure.travis-ci.org/ConradIrwin/pry-rescue.png?branch=master)](http://travis-ci.org/ConradIrwin/pry-rescue)
+
 Introduction
 ============
 
