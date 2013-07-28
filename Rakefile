@@ -1,3 +1,5 @@
+require 'rspec/core/rake_task'
+
 task :default => :test
 task :spec => :test
 
@@ -17,10 +19,7 @@ task :sintax do
   sh 'bin/rescue examples/syntax-err.rb'
 end
 
-desc "Run tests"
-task :test do
-  sh 'rspec spec'
-end
+RSpec::Core::RakeTask.new(:test)
 
 task :build do
   sh 'gem build *.gemspec'
