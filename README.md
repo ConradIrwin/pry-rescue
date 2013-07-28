@@ -5,7 +5,7 @@ Super-fast debugging for Ruby. (See [Pry to the rescue!](http://cirw.in/blog/pry
 ## Introduction
 
 pry-rescue is an implementation of "break on unhandled exception" for Ruby. Whenever an
-exception is raised, but not rescued, pry-rescue will automatically open pry for you:
+exception is raised, but not rescued, pry-rescue will automatically open Pry for you:
 
 ```ruby
 $ rescue examples/example2.rb
@@ -23,7 +23,7 @@ from /home/conrad/0/ruby/pry-rescue/examples/example2.rb:22:in `gamma`
 
 ## Installation
 
-You can install `pry-rescue` with rubygems as normal, and I strongly recommend you also
+You can install `pry-rescue` with RubyGems as normal, and I strongly recommend you also
 install `pry-stack_explorer`. See [Known bugs](#known-bugs) for places that won't work.
 
 ```
@@ -41,7 +41,7 @@ end
 
 ## Usage
 
-For simple ruby scripts, just run them with the `rescue` executable instead of the `ruby`
+For simple Ruby scripts, just run them with the `rescue` executable instead of the `ruby`
 executable.
 
 ```
@@ -50,7 +50,7 @@ rescue <script.rb> [arguments..]
 
 ### Rails
 
-For rails, use `rescue rails` in place of `rails`, for example:
+For Rails, use `rescue rails` in place of `rails`, for example:
 
 ```
 rescue rails server
@@ -62,19 +62,19 @@ If you're using `bundle exec` the rescue should go after the exec:
 bundle exec rescue rails server
 ```
 
-Then whenever an unhandled exception happens inside rails, a pry console will open on
-stdout. This is the same terminal that you see the rails logs on, so if you're
+Then whenever an unhandled exception happens inside Rails, a Pry console will open on
+stdout. This is the same terminal that you see the Rails logs on, so if you're
 using something like [pow](https://pow.cx) then you will run into difficulties.
 
 You might also be interested in
 [better_errors](https://github.com/charliesome/better_errors) which opens consoles in your
 browser on unhandled exceptions, and [pry-rails](https://github.com/rweng/pry-rails) which
-adds some rails specific helpers to pry, and replaces `rails console` by pry.
+adds some Rails specific helpers to Pry, and replaces `rails console` by Pry.
 
-### Rspec
+### RSpec
 
 If you're using [RSpec](https://rspec.org) or
-[respec](https://github.com/oggy/respec), you can open a pry session on
+[respec](https://github.com/oggy/respec), you can open a Pry session on
 every test failure using `rescue rspec` or `rescue respec`:
 
 ```ruby
@@ -120,7 +120,7 @@ use PryRescue::Rack if ENV["RACK_ENV"] == 'development'
 
 ## Pry commands
 
-`pry-rescue` adds two commands to pry. `cd-cause` and `try-again`. In combination with
+`pry-rescue` adds two commands to Pry. `cd-cause` and `try-again`. In combination with
 `edit --method` these can let you fix the problem with your code and verify that the fix
 worked without restarting your program.
 
@@ -168,7 +168,7 @@ To get back from `cd-cause` you can either type `<ctrl+d>` or `cd ..`.
 ### try-again
 
 Once you've used Pry's `edit` or command to fix your code, you can issue a `try-again`
-command to re-run your code. For rails and rack, this re-runs the request, for minitest
+command to re-run your code. For Rails and rack, this re-runs the request, for minitest
 and rspec, it re-runs the current test, for more advanced users this re-runs the
 `Pry::rescue{ }` block.
 
@@ -224,7 +224,7 @@ from examples/example.rb:7:in `rescue in test`
 
 ### Rescuing an exception
 
-Finally. If you're doing your own exception handling, you can ask pry to open on an exception that you've caught.
+Finally. If you're doing your own exception handling, you can ask Pry to open on an exception that you've caught.
 For this to work you must be inside a Pry::rescue{ } block.
 
 ```ruby
@@ -244,7 +244,7 @@ Sometimes bugs in your program don't cause exceptions. Instead your program just
 stuck. Examples include infinite loops, slow network calls, or tests that take a
 suprisingly long time to run.
 
-In this case it's useful to be able to open a pry console when you notice that your
+In this case it's useful to be able to open a Pry console when you notice that your
 program is not going anywhere. To do this, send your process a `SIGQUIT` using `<ctrl+\>`.
 
 ```ruby
@@ -279,7 +279,7 @@ export PRY_PEEK=EXIT  # peek on program exit
 ```
 
 If it's only important for one program, then you can also set the environment variable in
-ruby before requiring pry-rescue
+Ruby before requiring pry-rescue
 
 ```ruby
 ENV['PRY_PEEK'] = '' # disable SIGQUIT handler
@@ -287,7 +287,7 @@ require "pry-rescue"
 ```
 
 Finally, you can enable peeking into programs that do not include pry-rescue by
-configuring ruby to always load one (or several) of these files:
+configuring Ruby to always load one (or several) of these files:
 
 ```
 export RUBYOPT=-rpry-rescue/peek/int   # peek on SIGINT (<ctrl-c>)
@@ -299,7 +299,7 @@ export RUBYOPT=-rpry-rescue/peek/exit  # peek on program exit
 
 These last examples relies on having pry-rescue in the load path (i.e. at least in the
 gemset, or Gemfile of the program). If that is not true, you can use absolute paths. The
-hook files do not require the whole of pry-rescue, nor is any of pry itself loaded until
+hook files do not require the whole of pry-rescue, nor is any of Pry itself loaded until
 you trigger the signal.
 
 ```
@@ -308,13 +308,13 @@ export RUBYOPT=-r/home/cirwin/src/pry-rescue/lib/pry-rescue/peek/usr2
 
 ## Known bugs
 
-* ruby 2.0, 1.9.3, 1.9.2 – no known bugs
-* ruby 1.9.1 — not supported
-* ruby 1.8.7 — occasional incorrect values for self
-* ree 1.8.7 — no known bugs
-* jruby 1.7 (1.8 mode and 1.9 mode) — no known bugs
-* jruby 1.6 (1.8 mode and 1.9 mode) — incorrect value for self in NoMethodErrors
-* rbx (1.8 mode and 1.9 mode) – does not catch some low-level errors (e.g. ZeroDivisionError)
+* Ruby 2.0, 1.9.3, 1.9.2 – no known bugs
+* Ruby 1.9.1 — not supported
+* Ruby 1.8.7 — occasional incorrect values for self
+* REE 1.8.7 — no known bugs
+* JRuby 1.7 (1.8 mode and 1.9 mode) — no known bugs
+* JRuby 1.6 (1.8 mode and 1.9 mode) — incorrect value for self in NoMethodErrors
+* Rubinius (1.8 mode and 1.9 mode) – does not catch some low-level errors (e.g. ZeroDivisionError)
 
 ## Meta-fu
 
