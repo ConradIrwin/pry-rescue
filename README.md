@@ -4,6 +4,8 @@ Super-fast debugging for Ruby. (See [Pry to the rescue!](http://cirw.in/blog/pry
 
 ## Introduction
 
+[![Build Status](https://secure.travis-ci.org/ConradIrwin/pry-rescue.png?branch=master)](http://travis-ci.org/ConradIrwin/pry-rescue)
+
 pry-rescue is an implementation of "break on unhandled exception" for Ruby. Whenever an
 exception is raised, but not rescued, pry-rescue will automatically open Pry for you:
 
