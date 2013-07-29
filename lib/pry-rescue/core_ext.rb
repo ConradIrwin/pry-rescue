@@ -33,7 +33,7 @@ class << Pry
   #   end
   #
   def rescued(e=$!)
-    if e.instance_variable_get(:@rescue_bindings)
+    if e.instance_variable_defined?(:@rescue_bindings)
       PryRescue.enter_exception_context(e)
     else
       stack = ''
@@ -73,7 +73,7 @@ class << Pry
   def enable_rescuing!(block=nil)
     Interception.listen(block) do |exception, binding|
       bindings = binding.respond_to?(:callers) ? binding.callers : [binding]
-      unless exception.instance_variable_get(:@rescue_bindings)
+      unless exception.instance_variable_defined?(:@rescue_bindings)
         exception.instance_variable_set(:@rescue_bindings, bindings)
         exception.instance_variable_set(:@rescue_cause, $!)
       end
