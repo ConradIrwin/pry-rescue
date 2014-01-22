@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.executables   = s.files.grep(%r{^bin/}).map{|f| File.basename f}
 
   s.add_dependency 'pry'
-  s.add_dependency 'interception', '>= 0.3'
+  s.add_dependency 'interception', '>= 0.4'
 
   s.add_development_dependency 'pry-stack_explorer' # upgrade to regular dep?
 
