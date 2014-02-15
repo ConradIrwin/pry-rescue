@@ -38,10 +38,12 @@ end
 # @see {Pry::rescue}
 class PryRescue
   class << self
+    attr_accessor :any_exception_captured
 
     # Start a Pry session in the context of the exception.
     # @param [Exception] exception  The exception raised
     def enter_exception_context(exception)
+      @any_exception_captured = true
       @exception_context_depth ||= 0
       @exception_context_depth += 1
 
@@ -66,8 +68,15 @@ class PryRescue
 
     # Load a script wrapped in Pry::rescue{ }
     # @param [String] script  The name of the script
-    def load(script)
-      Pry::rescue{ Kernel.load script }
+    def load(script, ensure_repl = false)
+      require File.expand_path('../pry-rescue/kernel_exit_hooks.rb', __FILE__) if ensure_repl
+      Pry::rescue do
+        begin
+          TOPLEVEL_BINDING.eval File.read(script), script, 1
+        rescue SyntaxError => exception
+          puts "#{exception}\n"
+        end
+      end
     end
 
     # Is the user currently inside pry rescue?

@@ -4,7 +4,7 @@ USAGE = %{
 rescue (pry-rescue wrapper)
 
 Usage:
-  rescue [--peek] <script.rb> [arguments...]
+  rescue [-i] <script.rb> [arguments...]
 
 What it does:
   Runs <script.rb>, and if an uncaught exception is raised,
@@ -13,16 +13,23 @@ What it does:
 
   You can then poke around to figure out why your code broke!
 
-  If --peek is specified, then you can hit <Ctrl+C> to interrupt
-  your program and open a pry session at any time you need.
+  If -i is specified, then rescue will open a REPL whether or
+  not there was an exception. Specifying -i will also wrap
+  Kernel.at_exit and run exit callbacks before launching the
+  REPL if the script succeeds. This is useful for minitest and
+  other testing frameworks.
 
   See the README (http://bitly.com/pry-rescue) for more.
 }
+
+ensure_repl = false
+
 case ARGV[0]
 when '-h', '--help'
   puts USAGE
   exit
-when '--'
+when '-i'
+  ensure_repl = true
   ARGV.shift
 when /\A-/
   puts USAGE
@@ -39,7 +46,7 @@ if script = ARGV.shift
   $0 = File.expand_path(script)
   if File.exists? script
     require File.expand_path('../../lib/pry-rescue.rb', __FILE__)
-    PryRescue.load $0
+    PryRescue.load $0, ensure_repl
   else
     $stderr.puts "Error: #{script.inspect} not found."
   end
