@@ -2,7 +2,7 @@
 
 Super-fast debugging for Ruby. (See [Pry to the rescue!](http://cirw.in/blog/pry-to-the-rescue))
 <a href="https://travis-ci.org/ConradIrwin/pry-rescue">
-<img src="https://secure.travis-ci.org/ConradIrwin/pry-rescue.png?branch=master" alt="Build status">
+<img src="https://secure.travis-ci.org/ConradIrwin/pry-rescue.svg?branch=master" alt="Build status">
 </a>
 
 ## Introduction
