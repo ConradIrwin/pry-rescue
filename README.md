@@ -69,6 +69,15 @@ Then whenever an unhandled exception happens inside Rails, a Pry console will op
 stdout. This is the same terminal that you see the Rails logs on, so if you're
 using something like [pow](https://pow.cx) then you will run into difficulties.
 
+If you are using non-default http servers like Unicorn or Thin, you can also trigger
+this behavior via (after including pry-rescue in your Gemfile):
+
+```
+PRY_RESCUE_RAILS=1 bundle exec unicorn
+```
+
+
+
 You might also be interested in
 [better_errors](https://github.com/charliesome/better_errors) which opens consoles in your
 browser on unhandled exceptions, and [pry-rails](https://github.com/rweng/pry-rails) which
