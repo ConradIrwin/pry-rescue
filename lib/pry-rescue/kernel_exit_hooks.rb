@@ -7,7 +7,10 @@ class << PryRescue
     Pry::rescue do
       exit_callbacks.dup.each(&:call)
     end
-    TOPLEVEL_BINDING.pry unless any_exception_captured
+    unless any_exception_captured
+      print "\n"
+      TOPLEVEL_BINDING.pry
+    end
   end
 end
 
