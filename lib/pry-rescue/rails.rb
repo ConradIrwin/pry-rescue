@@ -6,7 +6,7 @@ class PryRescue
   # Just adding 'use PryRescue::Rack' inside your rails app will add
   # the middleware above the rails exception handling middleware,
   # and so it will not work.
-  if defined?(Rails)
+  if defined?(::Rails)
     class Railtie < ::Rails::Railtie
       initializer "pry_rescue" do |app|
         app.config.middleware.use PryRescue::Rack
