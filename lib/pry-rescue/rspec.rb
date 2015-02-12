@@ -11,9 +11,13 @@ class PryRescue
           before
 
           example.binding.eval('@exception = nil; @example && @example.instance_variable_set(:@exception, nil)')
+          example.binding.eval('example.instance_variable_set(:@exception, nil) if defined?(example)')
           example.binding.eval('@example && @example.example_group_instance.instance_variable_set(:@__memoized, {})')
+          example.binding.eval('example.example_group_instance.instance_variable_set(:@__memoized, {}) if defined?(example)')
           example.run
-          if e = example.binding.eval('@exception || @example && @example.instance_variable_get(:@exception)')
+          e = example.binding.eval('@exception || @example && @example.instance_variable_get(:@exception)')
+          e ||= example.binding.eval('example.instance_variable_get(:@exception) if defined?(example)')
+          if e
             Pry::rescued(e)
           end
 
