@@ -1,4 +1,6 @@
 require 'pry-rescue'
+require 'rspec'
+
 class PryRescue
   class RSpec
 
