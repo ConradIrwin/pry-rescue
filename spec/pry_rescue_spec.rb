@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe "PryRescue.load" do
+RSpec.describe "#PryRescue.load" do
   if defined?(PryStackExplorer)
     it "expect to open at the correct point" do
       expect(PryRescue).to receive(:pry).once do |opts|

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe "pry-rescue commands" do
+RSpec.describe "#Pry-rescue commands" do
   describe "#try-again" do
     it "expect to throw try_again" do
       expect(PryRescue).to receive(:in_exception_context?).and_return(true)

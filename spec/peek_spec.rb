@@ -2,7 +2,7 @@ require 'spec_helper'
 
 ENV['NO_PEEK_STARTUP_MESSAGE'] = 'true'
 
-RSpec.describe "PryRescue.peek!" do
+RSpec.describe "#PryRescue.peek!" do
   it "expect to open a pry in the binding of caller" do
     Pry.config.input = StringIO.new("foo = 6\nexit\n")
     Pry.config.output = StringIO.new
