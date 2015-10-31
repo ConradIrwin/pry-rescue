@@ -14,8 +14,13 @@ class PryRescue
 
           example.binding.eval('@exception = nil; @example && @example.instance_variable_set(:@exception, nil)')
           example.binding.eval('example.instance_variable_set(:@exception, nil) if defined?(example)')
-          example.binding.eval('@example && @example.example_group_instance.instance_variable_set(:@__memoized, {})')
-          example.binding.eval('example.example_group_instance.instance_variable_set(:@__memoized, {}) if defined?(example)')
+          if example.example_group_instance.respond_to?(:__init_memoized, true)
+            example.binding.eval('@example && @example.example_group_instance.instance_variable_set(:@__init_memoized, true)')
+            example.binding.eval('example.example_group_instance.instance_variable_set(:@__init_memoized, true) if defined?(example)')
+          else
+            example.binding.eval('@example && @example.example_group_instance.instance_variable_set(:@__memoized, {})')
+            example.binding.eval('example.example_group_instance.instance_variable_set(:@__memoized, {}) if defined?(example)')
+          end
           example.run
           e = example.binding.eval('@exception || @example && @example.instance_variable_get(:@exception)')
           e ||= example.binding.eval('example.instance_variable_get(:@exception) if defined?(example)')
