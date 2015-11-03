@@ -1,5 +1,5 @@
 require 'pry-rescue'
-require 'rspec'
+require 'rspec' unless defined?(RSpec)
 
 class PryRescue
   class RSpec
