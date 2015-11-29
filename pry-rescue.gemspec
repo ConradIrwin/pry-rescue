@@ -7,6 +7,7 @@ Gem::Specification.new do |s|
   s.email         = ['conrad.irwin@gmail.com', 'jrmair@gmail.com', 'chris@ill-logic.com']
   s.authors       = ['Conrad Irwin', 'banisterfiend', 'epitron']
   s.files         = `git ls-files`.split("\n")
+  s.license       = 'MIT'
   s.require_paths = ['lib']
   s.executables   = s.files.grep(%r{^bin/}).map{|f| File.basename f}
 
