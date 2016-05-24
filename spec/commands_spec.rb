@@ -1,121 +1,128 @@
-require './spec/spec_helper'
+require 'spec_helper'
 
-describe "pry-rescue commands" do
-  describe "try-again" do
-    it "should throw try_again" do
-      PryRescue.should_receive(:in_exception_context?).and_return{ true }
+RSpec.describe "#Pry-rescue commands" do
+  describe "#try-again" do
+    it "expect to throw try_again" do
+      expect(PryRescue).to receive(:in_exception_context?).and_return(true)
 
-      lambda{
-        Pry.new.process_command "try-again", '', TOPLEVEL_BINDING
-      }.should throw_symbol :try_again
+      expect( lambda{ Pry.new.process_command "try-again TOPLEVEL_BINDING" } ).to throw_symbol :try_again
     end
 
-    it "should raise a CommandError if not in Pry::rescue" do
-      PryRescue.should_receive(:in_exception_context?).and_return{ false }
+    it "expect to raise a CommandError if not in Pry::rescue" do
+      # expect(PryRescue).to receive(:in_exception_context?).and_return(false)
+      allow(PryRescue).to receive(:in_exception_context?).and_return(false)
 
-      lambda{
-        Pry.new.process_command "try-again", '', TOPLEVEL_BINDING
-      }.should raise_error Pry::CommandError
+       expect{ Pry.new.process_command "try-again TOPLEVEL_BINDING" }.to raise_error Pry::CommandError
     end
   end
 
-  describe "cd-cause" do
-    it "should enter the context of an explicit exception" do
+  describe "#cd-cause" do
+    it "expect to not enter the context of an explicit exception" do
       begin
         b1 = binding
         raise "original"
-      rescue => e1
+      rescue => ErrorOne
         b2 = binding
       end
 
-      Pry.should_receive(:rescued).once.with{ |raised|
-        raised.should == e1
-      }
-
-      Pry.new.process_command 'cd-cause e1', '', binding
-    end
-
-    it "should enter the context of _ex_ if no exception is given" do
-      b2 = nil
-      _ex_ = nil
-      Pry::rescue do
-        begin
-          b1 = binding
-          raise "original"
-        rescue => _ex_
-          b2 = binding
-        end
+      expect(Pry).to receive(:rescued) do |raised|
+        expect(raised).to eq(ErrorOne)
       end
 
-      Pry.should_receive(:rescued).once.with{ |raised|
-        raised.should == _ex_
-      }
-
-      Pry.new.process_command 'cd-cause', '', b2
+      Pry.new.process_command 'cd-cause ErrorOne binding'
     end
-  end
 
-  describe "cd-cause" do
-    it "should enter the next exception's context" do
-      _ex_ = nil
-      e1 = nil
-      Pry::rescue do
-        begin
+    context "when no exception is given" do
+      it "expect to enter the context of _ex_"  do
+        b2 = nil
+        _ex_ = nil
+        Pry::rescue do
           begin
             b1 = binding
             raise "original"
-          rescue => e1
+          rescue => ErrorOne
             b2 = binding
-            raise # similar to dubious re-raises you'll find in the wild
           end
-        rescue => e2
-          _ex_ = e2
         end
+
+        expect(Pry).to receive(:rescued) do |raised|
+          expect(raised).to eq(ErrorOne)
+        end
+
+        Pry.new.process_command 'cd-cause ErrorOne binding'
       end
-
-      PryRescue.should_receive(:enter_exception_context).once.with(e1)
-
-      Pry.new.process_command 'cd-cause', '', binding
     end
 
-    it "should raise a CommandError if no previous commands" do
-      begin
-        b1 = binding
-        raise "original"
-      rescue => e1
-        # Hacks due to us not really entering a pry session here
-        _rescued_ = e1
-        _ex_ = e1
-      end
-
-      lambda{
-        Pry.new.process_command 'cd-cause', '', binding
-      }.should raise_error Pry::CommandError, /No previous exception/
-    end
-
-    it "should raise a CommandError on a re-raise" do
-      _ex_ = nil
-      Pry::rescue do
-        begin
+    context "when it has nested exceptions" do
+      it "expect to enter the next exception's context" do
+        _ex_ = nil
+        e1 = nil
+        Pry::rescue do
           begin
-            raise "oops"
-          rescue => e
-            raise e
+            begin
+              b1 = binding
+              raise "original"
+            rescue => DeepException
+              b2 = binding
+              raise # similar to dubious re-raises you'll find in the wild
+            end
+          rescue => ErrorOne
+            _ex_ = ErrorOne
           end
-        rescue => _ex_
         end
-      end
-      _rescued_ = _ex_
 
-      lambda{
-        Pry.new.process_command 'cd-cause', '', binding
-      }.should raise_error Pry::CommandError, /No previous exception/
+        expect(PryRescue).to receive(:enter_exception_context) do |raised|
+          expect(raised).to eq(DeepException)
+        end
+
+        Pry.new.process_command 'cd-cause DeepException binding'
+      end
     end
 
-    it "should raise a CommandError if not in Pry::rescue" do
-      lambda{
-        Pry.new.process_command 'cd-cause', '', binding
-      }.should raise_error Pry::CommandError, /No previous exception/
+    context "when there are no previous commands" do
+      it "expect to raise a CommandError" do
+        begin
+          b1 = binding
+          raise "original"
+        rescue => ErrorOne
+          # Hacks due to us not really entering a pry session here
+          _rescued_ = ErrorOne
+          _ex_ = ErrorOne
+        end
+
+        expect {
+          Pry.new.process_command 'cd-cause'
+        }.to raise_error Pry::CommandError, /No previous exception/
+      end
+    end
+
+    context "when a re-raise occurs" do
+      it "expect to raise a CommandError" do
+        _ex_ = nil
+        Pry::rescue do
+          begin
+            begin
+              raise "oops"
+            rescue => e
+              raise e
+            end
+          rescue => _ex_
+          end
+        end
+        _rescued_ = _ex_
+
+        expect {
+          Pry.new.process_command 'cd-cause'
+        }.to raise_error Pry::CommandError, /No previous exception/
+      end
+    end
+
+    context "when not in Pry::rescue" do
+      it "should raise CommandError" do
+        expect {
+          Pry.new.process_command 'cd-cause'
+        }.to raise_error Pry::CommandError, /No previous exception/
+      end
     end
   end
 end

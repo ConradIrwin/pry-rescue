@@ -1,114 +1,123 @@
-require File.expand_path('../../lib/pry-rescue.rb', __FILE__)
-require 'uri'
+require 'spec_helper'
 
-describe "PryRescue.load" do
+RSpec.describe "#PryRescue.load" do
   if defined?(PryStackExplorer)
-    it "should open at the correct point" do
-      PryRescue.should_receive(:pry).once{ |opts|
-        opts[:call_stack].first.eval("__FILE__").should end_with('spec/fixtures/simple.rb')
-      }
-      lambda{
+    it "expect to open at the correct point" do
+      expect(PryRescue).to receive(:pry).once do |opts|
+       expect(opts[:call_stack].first.eval("__FILE__")).to end_with('spec/fixtures/simple.rb')
+      end
+
+      expect do
         PryRescue.load("spec/fixtures/simple.rb")
-      }.should raise_error(/simple-exception/)
+      end.to raise_error(/simple-exception/)
     end
 
-    it "should open above the standard library" do
-      PryRescue.should_receive(:pry).once do |opts|
-        opts[:call_stack][opts[:initial_frame]].eval("__FILE__").should end_with('spec/fixtures/uri.rb')
+    it "expect open above the standard library" do
+      expect(PryRescue).to receive(:pry).once do |opts|
+        expect(opts[:call_stack][opts[:initial_frame]].eval("__FILE__")).to end_with('spec/fixtures/uri.rb')
       end
-      lambda{
+
+      expect do
         PryRescue.load("spec/fixtures/uri.rb")
-      }.should raise_error(URI::InvalidURIError)
+      end.to raise_error(URI::InvalidURIError)
     end
 
-    it "should keep the standard library on the binding stack" do
-      PryRescue.should_receive(:pry).once do |opts|
-        opts[:call_stack].first.eval("__FILE__").should start_with(RbConfig::CONFIG['libdir'])
+    it "expect to keep the standard library on the binding stack" do
+      expect(PryRescue).to receive(:pry).once do |opts|
+        expect(opts[:call_stack].first.eval("__FILE__")).to start_with(RbConfig::CONFIG['libdir'])
       end
-      lambda{
+
+     expect do 
         PryRescue.load("spec/fixtures/uri.rb")
-      }.should raise_error(URI::InvalidURIError)
+     end.to raise_error(URI::InvalidURIError)
     end
 
-    it "should open above gems" do
-      PryRescue.should_receive(:pry).once do |opts|
-        opts[:call_stack][opts[:initial_frame]].eval("__FILE__").should end_with('spec/fixtures/coderay.rb')
+    it "expect to open above gems" do
+      expect(PryRescue).to receive(:pry).once do |opts|
+        expect(opts[:call_stack][opts[:initial_frame]].eval("__FILE__")).to end_with('spec/fixtures/coderay.rb')
       end
-      lambda{
+
+      expect do
         PryRescue.load("spec/fixtures/coderay.rb")
-      }.should raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
 
-    it "should open above gems" do
-      PryRescue.should_receive(:pry).once do |opts|
+    it "expect to open above gems" do
+      expect(PryRescue).to receive(:pry).once do |opts|
         coderay_path = Gem::Specification.respond_to?(:detect) ?
                          Gem::Specification.detect{|x| x.name == 'coderay' }.full_gem_path :
                          Gem.all_load_paths.grep(/coderay/).last
 
-        opts[:call_stack].first.eval("__FILE__").should start_with(coderay_path)
+        expect(opts[:call_stack].first.eval("__FILE__")).to start_with(coderay_path)
       end
-      lambda{
+
+      expect do 
         PryRescue.load("spec/fixtures/coderay.rb")
-      }.should raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
 
-    it "should skip pwd, even if it is a gem (but not vendor stuff)" do
-      Gem::Specification.stub :any? do true end
-      PryRescue.send(:user_path?, Dir.pwd + '/asdf.rb').should be_true
-      PryRescue.send(:user_path?, Dir.pwd + '/vendor/asdf.rb').should be_false
+    it "expect to skip pwd, even if it is a gem (but not vendor stuff)" do
+      allow(Gem::Specification).to receive(:any?).and_return(true)
+      expect(PryRescue.send(:user_path?, Dir.pwd + '/asdf.rb')).to be_truthy
+      expect(PryRescue.send(:user_path?, Dir.pwd + '/vendor/asdf.rb')).to be_falsey
     end
 
-    it "should filter out duplicate stack frames" do
-      PryRescue.should_receive(:pry).once do |opts|
-        opts[:call_stack][0].eval("__LINE__").should == 4
-        opts[:call_stack][1].eval("__LINE__").should == 12
+    it "expect to filter out duplicate stack frames" do
+      expect(PryRescue).to receive(:pry).once do |opts|
+        expect(opts[:call_stack][0].eval("__LINE__")).to eq(4)
+        expect(opts[:call_stack][1].eval("__LINE__")).to eq(12)
       end
-      lambda{
+
+      expect do 
         PryRescue.load("spec/fixtures/super.rb")
-      }.should raise_error(/super-exception/)
+      end.to raise_error(/super-exception/)
     end
 
-    it "should calculate correct initial frame even when duplicates are present" do
-      PryRescue.should_receive(:pry).once do |opts|
-        opts[:call_stack][0].eval("__FILE__").should end_with('fake.rb')
-        opts[:call_stack][opts[:initial_frame]].eval("__FILE__").should end_with('spec/fixtures/initial.rb')
+    it "expect calculate correct initial frame even when duplicates are present" do
+      expect(PryRescue).to receive(:pry).once do |opts|
+        expect(opts[:call_stack][0].eval("__FILE__")).to end_with('fake.rb')
+        expect(opts[:call_stack][opts[:initial_frame]].eval("__FILE__")).to end_with('spec/fixtures/initial.rb')
       end
-      lambda{
+
+      expect do
         PryRescue.load("spec/fixtures/initial.rb")
-      }.should raise_error(/no :baz please/)
+      end.to raise_error(/no :baz please/)
     end
 
-    it "should skip over reraises from within gems" do
-      PryRescue.should_receive(:pry).once do |opts|
-        opts[:call_stack][0].eval("__FILE__").should end_with('spec/fixtures/reraise.rb')
+    it "expect to skip over reraises from within gems" do
+      expect(PryRescue).to receive(:pry).once do |opts|
+        expect(opts[:call_stack][0].eval("__FILE__")).to end_with('spec/fixtures/reraise.rb')
       end
-      lambda{
+
+      expect do
         PryRescue.load("spec/fixtures/reraise.rb")
-      }.should raise_error(/reraise-exception/)
+      end.to raise_error(/reraise-exception/)
     end
 
-    it "should not skip over independent raises within gems" do
-      PryRescue.should_receive(:pry).once do |opts|
-        opts[:call_stack][0].eval("__FILE__").should end_with('fake.rb')
+    it "expect to not skip over independent raises within gems" do
+      expect(PryRescue).to receive(:pry).once do |opts|
+        expect(opts[:call_stack][0].eval("__FILE__")).to end_with('fake.rb')
       end
-      lambda{
+
+      expect do 
         PryRescue.load("spec/fixtures/raiseother.rb")
-      }.should raise_error(/raiseother_exception/)
+      end.to raise_error(/raiseother_exception/)
     end
 
-    it "should output a warning if the exception was not raised" do
-      PryRescue.should_not_receive(:enter_exception_context)
-      Pry.should_receive(:warn).once
+    it "expect output a warning if the exception was not raised" do
+      expect(PryRescue).to_not receive(:enter_exception_context)
+      expect(Pry).to receive(:warn).once
       Pry.rescued(RuntimeError.new("foo"))
     end
   else
-    it "should open at the correct point" do
-      Pry.should_receive(:start).once{ |binding, h|
-        binding.eval("__FILE__").should end_with('spec/fixtures/simple.rb')
-      }
-      lambda{
+    it "expect to open at the correct point" do
+      expect(Pry).to receive(:start).once do |binding, h|
+        expect(binding.eval("__FILE__")).to end_with('spec/fixtures/simple.rb')
+      end 
+
+      expect do 
         PryRescue.load("spec/fixtures/simple.rb")
-      }.should raise_error(/simple-exception/)
+      end.to raise_error(/simple-exception/)
     end
   end
 end
