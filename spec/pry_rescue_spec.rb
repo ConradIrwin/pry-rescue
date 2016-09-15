@@ -53,9 +53,16 @@ describe "PryRescue.load" do
     end
 
     it "should skip pwd, even if it is a gem (but not vendor stuff)" do
-      Gem::Specification.stub :any? do true end
-      PryRescue.send(:user_path?, Dir.pwd + '/asdf.rb').should be_true
-      PryRescue.send(:user_path?, Dir.pwd + '/vendor/asdf.rb').should be_false
+      # Gem::Specification.stub :any? do true end
+      allow(Gem::Specification).to receive(:any?).and_return(true)
+
+      expect(
+        PryRescue.send(:user_path?, Dir.pwd + '/asdf.rb')
+      ).to be true
+
+      expect(
+        PryRescue.send(:user_path?, Dir.pwd + '/vendor/asdf.rb')
+      ).to be false
     end
 
     it "should filter out duplicate stack frames" do
