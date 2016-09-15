@@ -34,12 +34,15 @@ when '-i'
 when /\A-/
   puts USAGE
   exit
-when 'rails'
-  ENV['PRY_RESCUE_RAILS'] = 'true'
-  exec(*ARGV)
-when /^re?spec|rake$/
-  ENV['SPEC_OPTS'] = "#{ENV['SPEC_OPTS']} -r pry-rescue/rspec"
-  exec(*ARGV)
+else
+  case File.basename(ARGV[0] || "")
+  when 'rails'
+    ENV['PRY_RESCUE_RAILS'] = 'true'
+    exec(*ARGV)
+  when /^re?spec|rake$/
+    ENV['SPEC_OPTS'] = "#{ENV['SPEC_OPTS']} -r pry-rescue/rspec"
+    exec(*ARGV)
+  end
 end
 
 if script = ARGV.shift
