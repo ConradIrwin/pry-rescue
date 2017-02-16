@@ -21,6 +21,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'redcarpet'
   s.add_development_dependency 'capybara'
 
+  # SPECIAL DEVELOPMENT GEM FOR OLD RUBY
+  # DONT USE THIS TRICK FOR RUNTIME GEM
   if Gem::Version.create(RUBY_VERSION) < Gem::Version.create("2.2.2")
     s.add_development_dependency 'yard', '< 0.9.6'
     s.add_development_dependency 'rack', ['~> 1.6', '< 1.7']
@@ -28,10 +30,13 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'yard'
   end
   if Gem::Version.create(RUBY_VERSION) < Gem::Version.create("2.1")
+    # capybara > nokogiri
     s.add_development_dependency 'nokogiri', ['~> 1.6', '< 1.7.0']
   end
   if Gem::Version.create(RUBY_VERSION) < Gem::Version.create("2.0")
+    # capybara > addressable > public_suffix
     s.add_development_dependency 'public_suffix', ['~> 1.4', '< 1.5']
+    # capybara > mime-types
     s.add_development_dependency 'mime-types', ['~> 2.6', '< 2.99']
   end
 end
