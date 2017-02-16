@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
 
   if Gem::Version.create(RUBY_VERSION) < Gem::Version.create("2.2.2")
     s.add_development_dependency 'yard', '< 0.9.6'
-    s.add_development_dependency 'rack', ['~> 1.6', '>= 1.6.5']
+    s.add_development_dependency 'rack', ['~> 1.6', '< 1.7']
   else
     s.add_development_dependency 'yard'
   end
