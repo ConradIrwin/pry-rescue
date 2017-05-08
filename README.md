@@ -111,11 +111,20 @@ code in a way that the `try-again` command can understand. You can still use
 
 ### Minitest
 
-Add the following to your `test_helper.rb` or to the top of your test file.
+Require minitest support in your `test_helper.rb` or to the top of your test file.
+
+For the MiniTest that ships with Ruby 1.9+:
 
 ```ruby
 require 'minitest/autorun'
 require 'pry-rescue/minitest'
+```
+
+For Minitest 5 via the minitest gem:
+
+```ruby
+require 'minitest/autorun'
+require 'pry-rescue/minitest_gem'
 ```
 
 Then, when you have a failure, you can use `edit`, `edit -c`, and `edit-method`, then
