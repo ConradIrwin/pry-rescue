@@ -6,9 +6,9 @@ describe "PryRescue.peek!" do
     Pry.config.output = StringIO.new
     foo = 5
 
-    lambda do
+    expect(lambda do
       PryRescue.peek!
-    end.should change{ foo }.from(5).to(6)
+    end).to change{ foo }.from(5).to(6)
   end
 
   # this will fail, or not?
@@ -22,8 +22,8 @@ describe "PryRescue.peek!" do
 
     foo = 5
 
-    lambda do
+    expect(lambda do
       PryRescue.peek!
-    end.should change{ foo }.from(5).to(6)
+    end).to change{ foo }.from(5).to(6)
   end
 end
