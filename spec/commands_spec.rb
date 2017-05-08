@@ -1,4 +1,5 @@
 require './spec/spec_helper'
+require './spec/fixtures/template_error'
 
 describe "pry-rescue commands" do
   describe "try-again" do
@@ -56,6 +57,30 @@ describe "pry-rescue commands" do
   end
 
   describe "cd-cause" do
+    context 're-raising with custom Exception' do
+      it "should not loop through same context" do
+        _ex_ = nil
+        e1 = nil
+        Pry::rescue do
+          begin
+            begin
+              _b1 = binding
+              raise "original"
+            rescue => e1
+              _b2 = binding
+              raise TemplateError.new(e1)
+            end
+          rescue => e2
+            _ex_ = e2
+          end
+        end
+
+        expect(PryRescue).to receive(:enter_exception_context).once.with(e1)
+
+        Pry.new.tap{ |p| p.push_binding(binding) }.process_command 'cd-cause'
+      end
+    end
+
     it "should enter the next exception's context" do
       _ex_ = nil
       e1 = nil
