@@ -79,6 +79,14 @@ class PryRescue
       end
     end
 
+    def load_rake(task)
+      require 'rake'
+      Pry::rescue do
+        load "#{Dir.pwd}/Rakefile"
+        Rake::Task[task].invoke
+      end
+    end
+
     # Is the user currently inside pry rescue?
     # @return [Boolean]
     def in_exception_context?
