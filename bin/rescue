@@ -52,7 +52,7 @@ end
 if script = ARGV.shift
   $0 = File.expand_path(script)
   if File.exists? script
-    require File.expand_path('../../lib/pry-rescue.rb', __FILE__)
+    require File.realpath(File.expand_path('../../lib/pry-rescue.rb', __FILE__))
     PryRescue.load $0, ensure_repl
   else
     $stderr.puts "Error: #{script.inspect} not found."
