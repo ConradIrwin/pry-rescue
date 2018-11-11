@@ -12,7 +12,7 @@ if ENV['PRY_RESCUE_RAILS']
 end
 case ENV['PRY_PEEK']
 when nil
-  PryRescue.peek_on_signal('QUIT') unless Pry::Helpers::BaseHelpers.windows?
+  PryRescue.peek_on_signal('QUIT') unless Pry::Helpers::Platform.windows?
 when ''
   # explicitly disable QUIT.
 else
