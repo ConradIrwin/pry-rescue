@@ -109,6 +109,12 @@ Unfortunately using `edit -c` to edit `_spec.rb` files does not yet reload the
 code in a way that the `try-again` command can understand. You can still use
 `try-again` if you edit code that is not in spec files.
 
+If you want pry-rescue to *always* be enabled when you run tests, simply add this line to your `test_helper.rb`:
+
+```ruby
+require 'pry-rescue/rspec'
+```
+
 ### Minitest
 
 Add the following to your `test_helper.rb` or to the top of your test file.
