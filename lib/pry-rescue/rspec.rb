@@ -1,4 +1,5 @@
 require 'pry-rescue'
+require 'pry-stack_explorer'
 require 'rspec' unless defined?(RSpec)
 
 class PryRescue
