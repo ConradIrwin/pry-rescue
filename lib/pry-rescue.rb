@@ -6,6 +6,7 @@ require File.expand_path('../pry-rescue/core_ext', __FILE__)
 require File.expand_path('../pry-rescue/commands', __FILE__)
 require File.expand_path('../pry-rescue/rack', __FILE__)
 require File.expand_path('../pry-rescue/peek.rb', __FILE__)
+require File.expand_path('../pry-rescue/source_location.rb', __FILE__)
 
 if ENV['PRY_RESCUE_RAILS']
   require File.expand_path('../pry-rescue/rails', __FILE__)
@@ -103,7 +104,7 @@ class PryRescue
     # @param [Exception] e  The raised exception
     def phantom_load_raise?(e)
       bindings = e.instance_variable_get(:@rescue_bindings)
-      bindings.any? && bindings.first.eval("__FILE__") == __FILE__
+      bindings.any? && SourceLocation.call(bindings.first)[0] == __FILE__
     end
 
     # When using pry-stack-explorer we want to start the rescue session outside of gems
@@ -113,7 +114,7 @@ class PryRescue
     # @return [Fixnum]  The offset of the first binding of user code
     def initial_frame(bindings)
       bindings.each_with_index do |binding, i|
-        return i if user_path?(binding.eval("__FILE__"))
+        return i if user_path?(SourceLocation.call(binding)[0])
       end
 
       0
@@ -170,7 +171,7 @@ class PryRescue
     def without_bindings_below_raise(bindings)
       return bindings if bindings.size <= 1
       bindings.drop_while do |b|
-        b.eval("__FILE__") == File.expand_path("../pry-rescue/core_ext.rb", __FILE__)
+        SourceLocation.call(b)[0] == File.expand_path("../pry-rescue/core_ext.rb", __FILE__)
       end.drop_while do |b|
         Interception == b.eval("self")
       end

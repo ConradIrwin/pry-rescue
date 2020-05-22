@@ -2,10 +2,18 @@ require File.expand_path('../../lib/pry-rescue.rb', __FILE__)
 require 'uri'
 
 describe "PryRescue.load" do
+  before :all do
+    if !binding.respond_to?(:source_location)
+      Binding.define_method :source_location do
+        PryRescue::SourceLocation.call(self)
+      end
+    end
+  end
+
   if defined?(PryStackExplorer)
     it "should open at the correct point" do
       expect(PryRescue).to receive(:pry).once { |opts|
-        expect(opts[:call_stack].first.eval("__FILE__")).to end_with('spec/fixtures/simple.rb')
+        expect(opts[:call_stack].first.source_location[0]).to end_with('spec/fixtures/simple.rb')
       }
       expect(lambda {
         PryRescue.load("spec/fixtures/simple.rb")
@@ -14,7 +22,7 @@ describe "PryRescue.load" do
 
     it "should open above the standard library" do
       expect(PryRescue).to receive(:pry).once do |opts|
-        expect(opts[:call_stack][opts[:initial_frame]].eval("__FILE__")).to end_with('spec/fixtures/uri.rb')
+        expect(opts[:call_stack][opts[:initial_frame]].source_location[0]).to end_with('spec/fixtures/uri.rb')
       end
       expect(lambda{
         PryRescue.load("spec/fixtures/uri.rb")
@@ -23,7 +31,7 @@ describe "PryRescue.load" do
 
     it "should keep the standard library on the binding stack" do
       expect(PryRescue).to receive(:pry).once do |opts|
-        expect(opts[:call_stack].first.eval("__FILE__")).to start_with(RbConfig::CONFIG['libdir'])
+        expect(opts[:call_stack].first.source_location[0]).to start_with(RbConfig::CONFIG['libdir'])
       end
       expect(lambda{
         PryRescue.load("spec/fixtures/uri.rb")
@@ -32,7 +40,7 @@ describe "PryRescue.load" do
 
     it "should open above gems" do
       expect(PryRescue).to receive(:pry).once do |opts|
-        expect(opts[:call_stack][opts[:initial_frame]].eval("__FILE__")).to end_with('spec/fixtures/coderay.rb')
+        expect(opts[:call_stack][opts[:initial_frame]].source_location[0]).to end_with('spec/fixtures/coderay.rb')
       end
       expect(lambda{
         PryRescue.load("spec/fixtures/coderay.rb")
@@ -45,7 +53,7 @@ describe "PryRescue.load" do
                          Gem::Specification.detect{|x| x.name == 'coderay' }.full_gem_path :
                          Gem.all_load_paths.grep(/coderay/).last
 
-        expect(opts[:call_stack].first.eval("__FILE__")).to start_with(coderay_path)
+        expect(opts[:call_stack].first.source_location[0]).to start_with(coderay_path)
       end
       expect(lambda{
         PryRescue.load("spec/fixtures/coderay.rb")
@@ -67,8 +75,8 @@ describe "PryRescue.load" do
 
     it "should filter out duplicate stack frames" do
       expect(PryRescue).to receive(:pry).once do |opts|
-        expect(opts[:call_stack][0].eval("__LINE__")).to be(4)
-        expect(opts[:call_stack][1].eval("__LINE__")).to be(12)
+        expect(opts[:call_stack][0].source_location[1]).to be(4)
+        expect(opts[:call_stack][1].source_location[1]).to be(12)
       end
       expect(lambda{
         PryRescue.load("spec/fixtures/super.rb")
@@ -77,8 +85,8 @@ describe "PryRescue.load" do
 
     it "should calculate correct initial frame even when duplicates are present" do
       expect(PryRescue).to receive(:pry).once do |opts|
-        expect(opts[:call_stack][0].eval("__FILE__")).to end_with('fake.rb')
-        expect(opts[:call_stack][opts[:initial_frame]].eval("__FILE__")).to end_with('spec/fixtures/initial.rb')
+        expect(opts[:call_stack][0].source_location[0]).to end_with('fake.rb')
+        expect(opts[:call_stack][opts[:initial_frame]].source_location[0]).to end_with('spec/fixtures/initial.rb')
       end
       expect(lambda{
         PryRescue.load("spec/fixtures/initial.rb")
@@ -87,7 +95,7 @@ describe "PryRescue.load" do
 
     it "should skip over reraises from within gems" do
       expect(PryRescue).to receive(:pry).once do |opts|
-        expect(opts[:call_stack][0].eval("__FILE__")).to end_with('spec/fixtures/reraise.rb')
+        expect(opts[:call_stack][0].source_location[0]).to end_with('spec/fixtures/reraise.rb')
       end
       expect(lambda{
         PryRescue.load("spec/fixtures/reraise.rb")
@@ -96,7 +104,7 @@ describe "PryRescue.load" do
 
     it "should not skip over independent raises within gems" do
       expect(PryRescue).to receive(:pry).once do |opts|
-        expect(opts[:call_stack][0].eval("__FILE__")).to end_with('fake.rb')
+        expect(opts[:call_stack][0].source_location[0]).to end_with('fake.rb')
       end
       expect(lambda{
         PryRescue.load("spec/fixtures/raiseother.rb")
@@ -111,7 +119,7 @@ describe "PryRescue.load" do
   else
     it "should open at the correct point" do
       expect(Pry).to receive(:start).once { |binding, h|
-        expect(binding.eval("__FILE__")).to end_with('spec/fixtures/simple.rb')
+        expect(binding.source_location[0]).to end_with('spec/fixtures/simple.rb')
       }
       expect(lambda{
         PryRescue.load("spec/fixtures/simple.rb")
