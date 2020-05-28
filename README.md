@@ -84,6 +84,7 @@ browser on unhandled exceptions, and [pry-rails](https://github.com/rweng/pry-ra
 adds some Rails specific helpers to Pry, and replaces `rails console` by Pry.
 
 ### RSpec
+**ActiveRecord users: see below caveat**
 
 If you're using [RSpec](https://rspec.org) or
 [respec](https://github.com/oggy/respec), you can open a Pry session on
@@ -105,10 +106,26 @@ RSpec::Expectations::ExpectationNotMetError: expected: 0.3
 [1] pry(main)>
 ```
 
+### Important caveat when using with Rails/ActiveRecord and transactional fixtures
+> Records are missing but should be there! Am I losing track of reality?
+
+You are not. (Probably.)
+
+By default, RSpec runs test examples in a transaction, and rolls it back when done.
+By the time Pry-Rescue fires, the transaction has already been rolled back and records are gone!
+
+A good sanity check is to call `Model.all`. It will usually be empty. However, at the time of the test, they were truly there.
+
+This bug is currently tracked at [#99](https://github.com/ConradIrwin/pry-rescue/issues/99).
+
+Current workaround: Pry-Rescue can't be used, but you can use `binding.pry` inside the test. You'll have access to all records you need there.
+
+### Using pry `edit`
 Unfortunately using `edit -c` to edit `_spec.rb` files does not yet reload the
 code in a way that the `try-again` command can understand. You can still use
 `try-again` if you edit code that is not in spec files.
 
+### Always enabled
 If you want pry-rescue to *always* be enabled when you run tests, simply add this line to your `test_helper.rb`:
 
 ```ruby
