@@ -40,7 +40,7 @@ else
     ENV['PRY_RESCUE_RAILS'] = 'true'
     exec(*ARGV)
   when 'rake'
-    require File.expand_path('../../lib/pry-rescue.rb', __FILE__)
+    require File.realpath(File.expand_path('../../lib/pry-rescue.rb', __FILE__))
     PryRescue.load_rake ARGV[1]
     exit
   when /^re?spec$/
@@ -51,6 +51,7 @@ end
 
 if script = ARGV.shift
   $0 = File.expand_path(script)
+
   if File.exists? script
     require File.realpath(File.expand_path('../../lib/pry-rescue.rb', __FILE__))
     PryRescue.load $0, ensure_repl
