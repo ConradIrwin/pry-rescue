@@ -8,29 +8,28 @@ class PryRescue
     # Run an Rspec example within Pry::rescue{ }.
     #
     # Takes care to ensure that `try-again` will work.
+    #
+    # `example` is a RSpec::Core::Example::Procsy
     def self.run(example)
       Pry::rescue do
         begin
           before
 
-          example.binding.eval('@exception = nil; @example && @example.instance_variable_set(:@exception, nil)')
-          example.binding.eval('example.instance_variable_set(:@exception, nil) if defined?(example)')
+          example.example.instance_variable_set(:@exception, nil)
+
           if example.example_group_instance.respond_to?(:__init_memoized, true)
-            example.binding.eval('@example && @example.example_group_instance.instance_variable_set(:@__init_memoized, true)')
-            example.binding.eval('example.example_group_instance.instance_variable_set(:@__init_memoized, true) if defined?(example)')
+            example.example_group_instance.instance_variable_set(:@__init_memoized, true)
           else
-            example.binding.eval('@example && @example.example_group_instance.instance_variable_set(:@__memoized, {})')
-            example.binding.eval('example.example_group_instance.instance_variable_set(:@__memoized, {}) if defined?(example)')
-          end
-          example.run
-          e = example.binding.eval('@exception || @example && @example.instance_variable_get(:@exception)')
-          e ||= example.binding.eval('example.instance_variable_get(:@exception) if defined?(example)')
-          if e
-            Pry::rescued(e)
+            example.example_group_instance.instance_variable_set(:@__memoized, {})
           end
 
+          example.run
+
+          # Rescued will be called in :after hook, which is ran before the second
+          # :around leg
+
         ensure
-          after
+          after_outside
         end
       end
     end
@@ -39,7 +38,12 @@ class PryRescue
       monkeypatch_capybara if defined?(Capybara)
     end
 
-    def self.after
+    def self.after(example)
+      e = example.exception
+      Pry::rescued(e) if e
+    end
+
+    def self.after_outside
       after_filters.each(&:call)
     end
 
@@ -67,5 +71,9 @@ end
 RSpec.configure do |c|
   c.around(:each) do |example|
     PryRescue::RSpec.run example
+  end
+
+  c.after(:each) do |example|
+    PryRescue::RSpec.after(example)
   end
 end
