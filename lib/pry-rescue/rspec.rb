@@ -16,12 +16,7 @@ class PryRescue
           before
 
           example.example.instance_variable_set(:@exception, nil)
-
-          if example.example_group_instance.respond_to?(:__init_memoized, true)
-            example.example_group_instance.instance_variable_set(:@__init_memoized, true)
-          else
-            example.example_group_instance.instance_variable_set(:@__memoized, {})
-          end
+          example.example_group_instance.instance_variable_set(:@__init_memoized, true)
 
           example.run
 
