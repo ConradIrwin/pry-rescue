@@ -1,3 +1,6 @@
+* RSpec: Fix Rescue opening after transactional tests are rolled back.
+(issue #99 - PR #118)
+
 * bin/rescue: Use realpaths (issue #109 - PR #110)
 
   *(Damien Robert)*
