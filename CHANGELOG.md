@@ -1,5 +1,6 @@
+## v1.5.2 (24 June 2020)
 * RSpec: Fix Rescue opening after transactional tests are rolled back.
-(issue #99 - PR #118)
+(issue #99 - PR #118) (@joallard)
 
 * bin/rescue: Use realpaths (issue #109 - PR #110)
 
