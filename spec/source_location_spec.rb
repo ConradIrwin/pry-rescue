@@ -1,5 +1,7 @@
 describe 'PryRescue::SourceLocation' do
   if RUBY_VERSION < "2.6.0"
+    require 'pry-rescue/source_location'
+
     subject { binding.source_location }
 
     it 'matches [file, line]' do
