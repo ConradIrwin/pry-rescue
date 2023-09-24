@@ -50,7 +50,13 @@ class PryRescue
       unless Capybara.respond_to?(:reset_sessions_after_rescue!)
         class << Capybara
           alias_method :reset_sessions_after_rescue!, :reset_sessions!
-          def reset_sessions!; end
+          def reset_sessions!
+            return if Capybara.raise_server_errors
+
+            session_pool.reverse_each do |_mode, session|
+              session.server.reset_error!
+            end
+          end
         end
 
         after_filters << Capybara.method(:reset_sessions_after_rescue!)
