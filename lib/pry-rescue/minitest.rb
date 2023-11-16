@@ -4,7 +4,12 @@ require 'pry-rescue'
 # minitest, we need to add Exception to its passthrough types
 # Note: We need to check the explicit minitest version because the minitest ecosystem
 # may redefine Minitest::Test for Minitest versions < 5.
-if defined?(Minitest::Test) && Minitest::Unit::VERSION.split('.').first.to_i >= 5
+minitest_version = if defined?(Minitest::Unit)
+  MiniTest::Unit::VERSION
+else
+  Minitest::VERSION
+end
+if defined?(Minitest::Test) && Gem::Version.new(minitest_version) >= Gem::Version.new('5.0.0')
 
   class Minitest::Test
     alias_method :run_without_rescue, :run
