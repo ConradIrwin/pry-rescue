@@ -1,3 +1,6 @@
+## v1.6.0 (9 January 2024)
+* Fix ruby 3.2 compatibility
+
 ## v1.5.2 (24 June 2020)
 * RSpec: Fix Rescue opening after transactional tests are rolled back.
 (issue #99 - PR #118) (@joallard)
