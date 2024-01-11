@@ -4,9 +4,7 @@ require 'uri'
 describe "PryRescue.load" do
   before :all do
     if !binding.respond_to?(:source_location)
-      Binding.define_method :source_location do
-        PryRescue::SourceLocation.call(self)
-      end
+      require 'pry-rescue/source_location'
     end
   end
 

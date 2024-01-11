@@ -1,13 +1,15 @@
-class PryRescue
-  module SourceLocation
-    DEPRECATION_TIME = Time.new(2021,4,1)
+if binding.respond_to?(:source_location)
+  raise 'source_location exists by default in Ruby 2.6 and greater, no need to required it manually'
+else
+  class PryRescue
+    module SourceLocation
+      def self.call(b)
+        [b.eval("__FILE__"), b.eval("__LINE__")]
+      end
+    end
+  end
 
-    WithRuby2_5 = ->(b){ [b.eval("__FILE__"), b.eval("__LINE__")] }
-    WithRuby2_6 = ->(b){ b.source_location }
-
-    define_singleton_method(
-      :call,
-      (RUBY_VERSION < "2.6.0") ? WithRuby2_5 : WithRuby2_6
-    )
+  Binding.define_method :source_location do
+    PryRescue::SourceLocation.call(self)
   end
 end
